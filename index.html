@@ -3,13 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoBuilt Ready Mix</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <title>CoBuilt Ready Mix – Fixed Quota Error</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #fefefe; color: #1e293b; scroll-behavior: smooth; }
+        nav { background: rgba(11,26,44,0.92); backdrop-filter: blur(12px); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 0.8rem; font-size: 1.6rem; font-weight: 800; color: white; }
+        .logo img { height: 44px; width: auto; border-radius: 12px; cursor: pointer; }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { text-decoration: none; font-weight: 600; color: #e2e8f0; transition: 0.2s; }
+        .nav-links a:hover { color: #f39c12; }
+        .hero { background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat; min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; padding: 2rem; cursor: pointer; transition: 0.3s; }
+        .hero-content { max-width: 800px; animation: fadeUp 0.8s ease; }
+        .hero h1 { font-size: 3.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+        .hero p { font-size: 1.3rem; margin-bottom: 2rem; }
+        .btn-group { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+        .btn { display: inline-block; padding: 0.9rem 2rem; border-radius: 50px; font-weight: 700; text-decoration: none; transition: 0.25s; }
+        .btn-primary { background: #e67e22; color: white; box-shadow: 0 8px 20px rgba(230,126,34,0.3); }
+        .btn-primary:hover { background: #cf711f; transform: translateY(-3px); }
+        .btn-outline { border: 2px solid white; color: white; background: transparent; }
+        .btn-outline:hover { background: white; color: #0b1a2c; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+        section { padding: 5rem 0; }
+        .section-title { text-align: center; font-size: 2.6rem; font-weight: 800; margin-bottom: 3rem; background: linear-gradient(135deg, #1e293b, #e67e22); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .about-grid { display: flex; flex-wrap: wrap; gap: 3rem; align-items: center; }
+        .about-text { flex: 1; }
+        .about-text p { font-size: 1.1rem; line-height: 1.6; color: #334155; margin-bottom: 1.5rem; }
+        .about-image { flex: 1; border-radius: 32px; overflow: hidden; box-shadow: 0 30px 40px -20px rgba(0,0,0,0.25); cursor: pointer; }
+        .about-image img { width: 100%; display: block; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1rem; }
+        .service-card { background: white; border-radius: 32px; overflow: hidden; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); transition: all 0.3s; text-align: center; }
+        .service-card:hover { transform: translateY(-8px); }
+        .service-img { width: 100%; height: 220px; object-fit: cover; cursor: pointer; background: #f1f5f9; }
+        .service-card h3 { font-size: 1.6rem; margin: 1rem 0 0.5rem; }
+        .service-card p { padding: 0 1rem 1.5rem; color: #475569; }
+        .contact-wrapper { display: flex; flex-wrap: wrap; gap: 2rem; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); border-radius: 48px; padding: 2rem; }
+        .contact-info, .contact-form { flex: 1; background: white; border-radius: 32px; padding: 2rem; }
+        .contact-detail { display: flex; align-items: center; gap: 1rem; margin: 1.2rem 0; }
+        .contact-detail i { width: 44px; height: 44px; background: #e67e2210; display: flex; align-items: center; justify-content: center; border-radius: 30px; color: #e67e22; }
+        input, textarea { width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 28px; font-family: inherit; margin-bottom: 1rem; }
+        .btn-submit { background: #0b1a2c; color: white; border: none; padding: 1rem; border-radius: 40px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-submit:hover { background: #e67e22; }
+        footer { background: #0b1a2c; color: #94a3b8; text-align: center; padding: 2rem; margin-top: 2rem; }
+        .admin-panel { position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #0b1a2c; backdrop-filter: blur(8px); border-radius: 60px; padding: 6px 12px; display: flex; gap: 8px; }
+        .admin-btn { background: #e67e22; border: none; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .admin-btn.outline { background: transparent; border: 1px solid white; color: white; }
+        .admin-btn.danger { background: #c0392b; }
+        .editable-text { cursor: text; display: inline-block; }
+        .edit-mode .editable-text:hover { background: rgba(230,126,34,0.15); outline: 1px dashed #e67e22; border-radius: 8px; }
+        .edit-mode .clickable-image { cursor: pointer; position: relative; }
+        .edit-mode .clickable-image:hover::after { content: "✏️ Click to replace"; position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 4px 12px; border-radius: 30px; font-size: 12px; pointer-events: none; }
+        .message-toast { position: fixed; bottom: 90px; right: 20px; background: #1e293b; color: white; padding: 10px 20px; border-radius: 40px; font-size: 14px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none; }
+        .message-toast.success { background: #166534; }
+        .message-toast.error { background: #991b1b; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 880px) { .hero h1 { font-size: 2.5rem; } .section-title { font-size: 2rem; } .nav-links { display: none; } }
+    </style>
 </head>
 <body>
 
 <nav>
-    <img src="assets/img/logo.png" class="logo"/>
+    <div class="logo">
+        <img id="logoImg" class="clickable-image" src="https://placehold.co/80x80/e67e22/white?text=Logo" style="height:44px;">
+        <span id="logoText" class="editable-text">CoBuilt</span><span id="logoSpan" class="editable-text">RM</span>
+    </div>
     <ul class="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#services">Services</a></li>
@@ -17,33 +76,366 @@
     </ul>
 </nav>
 
-<header class="hero">
-    <h1>Ready Mix Concrete<br>Built For Strength</h1>
-    <p>Reliable concrete supply with on-time delivery.</p>
+<header class="hero" id="heroSection">
+    <div class="hero-content">
+        <h1 id="heroTitle" class="editable-text">Ready Mix Concrete<br>Built For Strength</h1>
+        <p id="heroSubtitle" class="editable-text">Reliable concrete supply with on-time delivery.</p>
+        <div class="btn-group">
+            <a href="#contact" class="btn btn-primary">Request Quote</a>
+            <a href="#services" class="btn btn-outline">Our Services</a>
+        </div>
+    </div>
 </header>
 
 <section id="about">
-    <h2>About CoBuilt</h2>
-    <p>This is placeholder text. Replace with your content.</p>
+    <div class="container">
+        <h2 class="section-title editable-text">About CoBuilt</h2>
+        <div class="about-grid">
+            <div class="about-text">
+                <p id="aboutText1" class="editable-text"><strong>CoBuilt Ready Mix</strong> is Ethiopia's leading provider of high-strength concrete.</p>
+                <p id="aboutText2" class="editable-text">Our mission: exceed structural standards with just-in-time delivery.</p>
+            </div>
+            <div class="about-image clickable-image">
+                <img id="aboutImage" src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Concrete plant">
+            </div>
+        </div>
+    </div>
 </section>
 
-<section id="services">
-    <h2>Services</h2>
-    <div class="service">
-        <img src="assets/img/services/service-placeholder.jpg"/>
-        <p>Ready Mix Concrete Supply</p>
+<section id="services" style="background:#f8fafc;">
+    <div class="container">
+        <h2 class="section-title editable-text">Our Concrete Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <img class="service-img clickable-image" id="serviceImg0" src="https://placehold.co/600x400/e67e22/white?text=Ready-Mix">
+                <h3 id="serviceTitle0" class="editable-text">Ready-Mix Concrete</h3>
+                <p id="serviceDesc0" class="editable-text">Custom mixes C15–C50 for any project.</p>
+            </div>
+            <div class="service-card">
+                <img class="service-img clickable-image" id="serviceImg1" src="https://placehold.co/600x400/e67e22/white?text=Pumping">
+                <h3 id="serviceTitle1" class="editable-text">Concrete Pumping</h3>
+                <p id="serviceDesc1" class="editable-text">Efficient boom and line pumping.</p>
+            </div>
+            <div class="service-card">
+                <img class="service-img clickable-image" id="serviceImg2" src="https://placehold.co/600x400/e67e22/white?text=Custom+Mix">
+                <h3 id="serviceTitle2" class="editable-text">Custom Mix Design</h3>
+                <p id="serviceDesc2" class="editable-text">Fiber-reinforced, waterproof, sustainable.</p>
+            </div>
+        </div>
     </div>
 </section>
 
 <section id="contact">
-    <h2>Contact Us</h2>
-    <p>Phone: +251 900 000 000</p>
+    <div class="container">
+        <h2 class="section-title editable-text">Let's Build Together</h2>
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <h3><i class="fas fa-phone-alt" style="color:#e67e22"></i> Get in touch</h3>
+                <div class="contact-detail"><i class="fas fa-map-marker-alt"></i> <span id="contactAddress" class="editable-text">Bole Road, Addis Ababa</span></div>
+                <div class="contact-detail"><i class="fas fa-phone"></i> <span id="contactPhone" class="editable-text">+251 900 000 000</span></div>
+                <div class="contact-detail"><i class="fas fa-envelope"></i> <span id="contactEmail" class="editable-text">info@cobuilt.com</span></div>
+            </div>
+            <div class="contact-form">
+                <h3>Request a Quote</h3>
+                <form id="quoteForm">
+                    <input type="text" id="name" placeholder="Full name" required>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <textarea rows="3" id="message" placeholder="Project details"></textarea>
+                    <button type="submit" class="btn-submit">Send Inquiry</button>
+                </form>
+                <p id="formFeedback" style="margin-top:1rem;"></p>
+            </div>
+        </div>
+    </div>
 </section>
 
 <footer>
-    <p>© 2026 CoBuilt Ready Mix</p>
+    <p>© 2026 CoBuilt Ready Mix — Strength you can rely on.</p>
 </footer>
 
-<script src="assets/js/script.js"></script>
+<div class="admin-panel">
+    <button class="admin-btn" id="toggleEditBtn">🔓 Enable Edit Mode</button>
+    <button class="admin-btn outline" id="saveChangesBtn" style="display:none;">💾 Save Changes</button>
+    <button class="admin-btn danger" id="clearDataBtn">🗑️ Clear All</button>
+</div>
+
+<script>
+    let editModeActive = false;
+
+    // Ultra-aggressive compression to fit within localStorage (max 5MB total)
+    async function compressImage(file, maxWidth, quality) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressed = canvas.toDataURL('image/jpeg', quality);
+                    resolve(compressed);
+                };
+                img.onerror = reject;
+            };
+            reader.onerror = reject;
+        });
+    }
+
+    function showMessage(text, type = 'success') {
+        const existing = document.querySelector('.message-toast');
+        if (existing) existing.remove();
+        const div = document.createElement('div');
+        div.className = `message-toast ${type}`;
+        div.innerText = text;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 4000);
+    }
+
+    // Approximate size of a string in bytes (2 bytes per char for JS strings)
+    function getSizeInKB(str) {
+        return (str.length * 2) / 1024;
+    }
+
+    async function replaceImageWithCompression(imgElement, maxWidth, quality, imgName) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const compressed = await compressImage(file, maxWidth, quality);
+                imgElement.src = compressed;
+                showMessage(`${imgName} updated (${Math.round(getSizeInKB(compressed))} KB)`, 'success');
+            } catch (err) {
+                showMessage(`Error: ${err.message}`, 'error');
+            }
+        };
+        input.click();
+    }
+
+    async function replaceHeroBackground() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const compressed = await compressImage(file, 600, 0.35);
+                document.getElementById('heroSection').style.backgroundImage = `linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), url('${compressed}')`;
+                showMessage(`Hero background updated (${Math.round(getSizeInKB(compressed))} KB)`, 'success');
+            } catch (err) {
+                showMessage(`Error: ${err.message}`, 'error');
+            }
+        };
+        input.click();
+    }
+
+    function attachImageHandlers() {
+        const logo = document.getElementById('logoImg');
+        logo.onclick = () => { if (editModeActive) replaceImageWithCompression(logo, 100, 0.3, 'Logo'); };
+        const aboutImg = document.getElementById('aboutImage');
+        aboutImg.onclick = () => { if (editModeActive) replaceImageWithCompression(aboutImg, 400, 0.4, 'About image'); };
+        for (let i = 0; i < 3; i++) {
+            const sImg = document.getElementById(`serviceImg${i}`);
+            sImg.onclick = () => { if (editModeActive) replaceImageWithCompression(sImg, 300, 0.35, `Service ${i+1} image`); };
+        }
+        const heroSection = document.getElementById('heroSection');
+        heroSection.onclick = (e) => {
+            if (!editModeActive) return;
+            if (e.target.closest('.hero-content') || e.target.closest('.btn')) return;
+            replaceHeroBackground();
+        };
+    }
+
+    function enableEditMode() {
+        document.body.classList.add('edit-mode');
+        document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'true'));
+        editModeActive = true;
+        document.getElementById('toggleEditBtn').innerHTML = '🔒 Disable Edit Mode';
+        document.getElementById('saveChangesBtn').style.display = 'inline-block';
+        showMessage('Edit mode ON – click any text or image to edit', 'success');
+    }
+
+    function disableEditMode() {
+        document.body.classList.remove('edit-mode');
+        document.querySelectorAll('.editable-text').forEach(el => el.removeAttribute('contenteditable'));
+        editModeActive = false;
+        document.getElementById('toggleEditBtn').innerHTML = '🔓 Enable Edit Mode';
+        document.getElementById('saveChangesBtn').style.display = 'none';
+        showMessage('Edit mode OFF', 'success');
+    }
+
+    // Estimate total size before saving and warn if exceeds 4MB
+    function estimateTotalSize() {
+        let total = 0;
+        const items = [
+            document.getElementById('logoImg').src,
+            document.getElementById('aboutImage').src,
+            document.getElementById('serviceImg0').src,
+            document.getElementById('serviceImg1').src,
+            document.getElementById('serviceImg2').src,
+            document.getElementById('heroSection').style.backgroundImage
+        ];
+        for (let src of items) {
+            if (src) total += src.length * 2;
+        }
+        // Add text fields (small)
+        const textIds = ['heroTitle', 'heroSubtitle', 'aboutText1', 'aboutText2', 'contactAddress', 'contactPhone', 'contactEmail', 'logoText', 'logoSpan'];
+        for (let id of textIds) {
+            const el = document.getElementById(id);
+            if (el) total += el.innerText.length * 2;
+        }
+        for (let i=0; i<3; i++) {
+            const title = document.getElementById(`serviceTitle${i}`);
+            if (title) total += title.innerText.length * 2;
+            const desc = document.getElementById(`serviceDesc${i}`);
+            if (desc) total += desc.innerText.length * 2;
+        }
+        return total / 1024; // KB
+    }
+
+    async function saveAllChanges() {
+        try {
+            // First, estimate size
+            const estimatedKB = estimateTotalSize();
+            if (estimatedKB > 4000) {
+                showMessage(`⚠️ Estimated total size ${Math.round(estimatedKB)} KB (limit ~5000 KB). Try replacing images with smaller ones.`, 'error');
+                // Still attempt to save, but might fail
+            }
+            
+            // Save text fields
+            const textIds = ['heroTitle', 'heroSubtitle', 'aboutText1', 'aboutText2', 'contactAddress', 'contactPhone', 'contactEmail', 'logoText', 'logoSpan'];
+            textIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) localStorage.setItem(`text_${id}`, el.innerText);
+            });
+            for (let i = 0; i < 3; i++) {
+                const titleEl = document.getElementById(`serviceTitle${i}`);
+                if (titleEl) localStorage.setItem(`service_title_${i}`, titleEl.innerText);
+                const descEl = document.getElementById(`serviceDesc${i}`);
+                if (descEl) localStorage.setItem(`service_desc_${i}`, descEl.innerText);
+            }
+            // Save images (with individual try-catch to identify which fails)
+            const imageItems = [
+                { id: 'logoImg', key: 'img_logo' },
+                { id: 'aboutImage', key: 'img_about' },
+                { id: 'serviceImg0', key: 'img_service_0' },
+                { id: 'serviceImg1', key: 'img_service_1' },
+                { id: 'serviceImg2', key: 'img_service_2' }
+            ];
+            for (let item of imageItems) {
+                const img = document.getElementById(item.id);
+                if (img) {
+                    try {
+                        localStorage.setItem(item.key, img.src);
+                    } catch (e) {
+                        if (e.name === 'QuotaExceededError') {
+                            showMessage(`❌ Image "${item.id}" is too large. Please replace it with a smaller image (under 200KB).`, 'error');
+                            return;
+                        } else throw e;
+                    }
+                }
+            }
+            // Hero background
+            const heroBg = document.getElementById('heroSection').style.backgroundImage;
+            if (heroBg) {
+                try {
+                    localStorage.setItem('hero_bg', heroBg);
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        showMessage(`❌ Hero background image is too large. Replace with a smaller image.`, 'error');
+                        return;
+                    } else throw e;
+                }
+            }
+            showMessage(`✅ All changes saved! Total size ~${Math.round(estimatedKB)} KB. Refresh to verify.`, 'success');
+        } catch (e) {
+            showMessage(`Save failed: ${e.message}`, 'error');
+        }
+    }
+
+    function loadSavedChanges() {
+        const textIds = ['heroTitle', 'heroSubtitle', 'aboutText1', 'aboutText2', 'contactAddress', 'contactPhone', 'contactEmail', 'logoText', 'logoSpan'];
+        textIds.forEach(id => {
+            const saved = localStorage.getItem(`text_${id}`);
+            if (saved && document.getElementById(id)) document.getElementById(id).innerText = saved;
+        });
+        for (let i = 0; i < 3; i++) {
+            const savedTitle = localStorage.getItem(`service_title_${i}`);
+            if (savedTitle && document.getElementById(`serviceTitle${i}`)) document.getElementById(`serviceTitle${i}`).innerText = savedTitle;
+            const savedDesc = localStorage.getItem(`service_desc_${i}`);
+            if (savedDesc && document.getElementById(`serviceDesc${i}`)) document.getElementById(`serviceDesc${i}`).innerText = savedDesc;
+        }
+        const savedLogo = localStorage.getItem('img_logo');
+        if (savedLogo && document.getElementById('logoImg')) document.getElementById('logoImg').src = savedLogo;
+        const savedAbout = localStorage.getItem('img_about');
+        if (savedAbout && document.getElementById('aboutImage')) document.getElementById('aboutImage').src = savedAbout;
+        for (let i = 0; i < 3; i++) {
+            const savedSImg = localStorage.getItem(`img_service_${i}`);
+            if (savedSImg && document.getElementById(`serviceImg${i}`)) document.getElementById(`serviceImg${i}`).src = savedSImg;
+        }
+        const savedHeroBg = localStorage.getItem('hero_bg');
+        if (savedHeroBg && document.getElementById('heroSection')) document.getElementById('heroSection').style.backgroundImage = savedHeroBg;
+    }
+
+    function clearAllData() {
+        if (confirm('Delete all saved changes? This will restore the original content.')) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    attachImageHandlers();
+    loadSavedChanges();
+
+    document.getElementById('toggleEditBtn').addEventListener('click', () => editModeActive ? disableEditMode() : enableEditMode());
+    document.getElementById('saveChangesBtn').addEventListener('click', saveAllChanges);
+    document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            if (targetId === "#") return;
+            const target = document.querySelector(targetId);
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Form handler
+    const form = document.getElementById('quoteForm');
+    const feedback = document.getElementById('formFeedback');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name')?.value.trim();
+            const email = document.getElementById('email')?.value.trim();
+            if (!name || !email) {
+                feedback.innerHTML = '❌ Please fill in name and email.';
+                feedback.style.color = '#c0392b';
+                return;
+            }
+            feedback.innerHTML = '✓ Thank you! We will contact you within 24h.';
+            feedback.style.color = '#2e7d32';
+            form.reset();
+            setTimeout(() => feedback.innerHTML = '', 4000);
+        });
+    }
+</script>
 </body>
 </html>
