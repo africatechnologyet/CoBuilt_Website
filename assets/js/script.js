@@ -111,7 +111,7 @@
     /* hero */
     var heroLogos = h.showLogos === false ? [] : clients.slice(0, h.logoCount || 6);
     var isPhone = window.matchMedia && matchMedia('(max-width:640px)').matches;
-    var bgv = h.backgroundVideo && (!isPhone || h.videoOnPhones) ? '<video class="hero-video" src="' + url(h.backgroundVideo) + '" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>' : '';
+    var bgv = h.backgroundVideo && (!isPhone || h.videoOnPhones) ? '<video class="hero-video" data-src="' + url(h.backgroundVideo) + '" muted loop playsinline preload="none" aria-hidden="true"></video>' : '';
     html += '<section class="hero' + (bgv ? ' has-video' : '') + '" id="top">' + bgv + '<div class="vignette"></div><div class="spot"></div><div class="hero-in">' +
       '<div class="par" data-par="-14,-10"><img class="hero-logo" src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" width="686" height="720"></div>' +
       '<h1 class="par" data-par="8,6"><span class="concrete l1">' + esc(h.line1) + '</span><span class="concrete l2">' + esc(h.line2) + '</span></h1>' +
@@ -156,7 +156,7 @@
       var hasFile = vd.source === 'file' && vd.file;
       if (yid || hasFile) {
         var poster = vd.poster || '';
-        if (yid && (!poster || /assets\/img\/plant\.jpg$/.test(poster))) poster = 'https://i.ytimg.com/vi/' + yid + '/hqdefault.jpg';
+        if (yid && (!poster || /assets\/img\/plant\.(jpg|webp)$/.test(poster))) poster = 'https://i.ytimg.com/vi/' + yid + '/hqdefault.jpg';
         html += '<section class="sec" id="video"><div class="wrap">' + head(vd, true) +
           '<div class="vbox reveal" data-yt="' + esc(yid) + '" data-file="' + (hasFile ? url(vd.file) : '') + '">' +
           '<button type="button" class="vplay" aria-label="Play video: ' + esc((vd.title || '') + ' ' + (vd.highlight || '')) + '">' +
@@ -339,10 +339,17 @@
       });
     });
     var hv = document.querySelector('.hero-video');
-    if (hv) {
-      if (reduce) { hv.removeAttribute('autoplay'); hv.pause(); }
-      hv.addEventListener('canplay', function () { hv.classList.add('ready'); });
-      hv.addEventListener('error', function () { hv.remove(); });
+    if (hv && !reduce) {
+      // start the background video only after everything else has loaded, so it never slows the page
+      var startVideo = function () {
+        var conn = navigator.connection || {};
+        if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')) { hv.remove(); return; }
+        hv.addEventListener('canplay', function () { hv.classList.add('ready'); hv.play().catch(function () {}); }, { once: true });
+        hv.addEventListener('error', function () { hv.remove(); }, { once: true });
+        hv.preload = 'auto'; hv.src = hv.getAttribute('data-src');
+      };
+      if (document.readyState === 'complete') setTimeout(startVideo, instant ? 0 : 600);
+      else window.addEventListener('load', function () { setTimeout(startVideo, 600); }, { once: true });
     }
 
     // back to top visibility

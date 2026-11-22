@@ -226,7 +226,7 @@
   }
 
   /* ================= pictures ================= */
-  var MAX = { photo: 2400, wide: 2600, bg: 2600, logo: 800 };
+  var MAX = { photo: 1800, wide: 2000, bg: 2000, logo: 480 };
   function processImage(file, kind) {
     return new Promise(function (resolve, reject) {
       if (!/^image\//.test(file.type)) { reject(new Error('Please choose a picture file (JPG or PNG).')); return; }
@@ -242,9 +242,12 @@
           var cx = cv.getContext('2d'); cx.imageSmoothingQuality = 'high';
           var png = kind === 'logo';
           if (!png) { cx.fillStyle = '#000'; cx.fillRect(0, 0, cw, ch); }
+          else cx.clearRect(0, 0, cw, ch);
           cx.drawImage(img, 0, 0, cw, ch);
-          var dataUrl = png ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.86);
-          resolve({ dataUrl: dataUrl, b64: dataUrl.split(',')[1], ext: png ? 'png' : 'jpg', w: cw, h: ch });
+          // WebP is 60–75% smaller than JPG/PNG; fall back if this browser cannot make WebP
+          var dataUrl = cv.toDataURL('image/webp', png ? 0.9 : 0.8), ext = 'webp';
+          if (dataUrl.indexOf('data:image/webp') !== 0) { dataUrl = png ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.85); ext = png ? 'png' : 'jpg'; }
+          resolve({ dataUrl: dataUrl, b64: dataUrl.split(',')[1], ext: ext, w: cw, h: ch });
         };
         img.src = r.result;
       };
