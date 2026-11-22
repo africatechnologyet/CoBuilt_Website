@@ -4,8 +4,8 @@ Your website now has two parts:
 
 | | Address | Who uses it |
 |---|---|---|
-| **Public website** | `https://www.cobuiltsolutions.com` | Your customers |
-| **Admin panel** | `https://www.cobuiltsolutions.com/admin` | Only you (needs your access key) |
+| **Public website** | `https://www.cobuiltready-mixconcrete.com` | Your customers |
+| **Admin panel** | `https://www.cobuiltready-mixconcrete.com/admin` | Only you (needs your access key) |
 
 In the admin panel you change any text, number, list or picture and press **Publish**. Your changes are saved to GitHub, and Render puts them on the live website in about **1–2 minutes**. Every publish is kept in history, so nothing is ever lost.
 
@@ -51,7 +51,7 @@ The key is like a password that lets the admin panel save changes to your websit
 
 ## Step 4 — Sign in to the admin panel
 
-1. Go to `https://www.cobuiltsolutions.com/admin`
+1. Go to `https://www.cobuiltready-mixconcrete.com/admin`
 2. Paste your access key and press **Sign in**.
 3. Leave **Keep me signed in on this device** ticked on your own computer or phone.
 
