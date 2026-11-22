@@ -297,7 +297,7 @@ footer .wrap{position:relative;padding-top:72px;padding-bottom:40px;display:flex
 .locs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px}
 .loc{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .25s}
 .loc:hover{border-color:#3A3A42}
-.loc .map{position:relative;aspect-ratio:16/10;background:#141417 radial-gradient(circle at 50% 45%,rgba(255,255,255,.05),transparent 60%)}
+.loc .map{position:relative;height:200px;background:#141417 radial-gradient(circle at 50% 45%,rgba(255,255,255,.05),transparent 60%)}
 .loc iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.25) invert(.92) hue-rotate(180deg) contrast(.9)}
 .lbody{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px;padding:24px}
 .lbody > div{flex:1 1 180px;min-width:0}
@@ -306,4 +306,4 @@ footer .wrap{position:relative;padding-top:72px;padding-bottom:40px;display:flex
 .lbody .lnote{margin-top:6px;font-size:14px}
 .lpin{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex:none;color:var(--accent);border:1px solid var(--line);background:rgba(255,255,255,.02)}
 .lbody .btn{align-self:center}
-@media (max-width:640px){.lbody{padding:20px}.lbody .btn{width:100%;justify-content:center}}
+@media (max-width:640px){.loc .map{height:170px}.lbody{padding:20px}.lbody .btn{width:100%;justify-content:center}}
