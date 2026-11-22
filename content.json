@@ -18,7 +18,7 @@
     "buttonText": "Request a quote",
     "showLogos": true,
     "logoCount": 12,
-    "backgroundVideo": "assets/video/uploads/hero-optimized.mp4",
+    "backgroundVideo": "",
     "videoOnPhones": false
   },
   "stats": [
