@@ -41,6 +41,26 @@
       "label": "Projects supplied"
     }
   ],
+  "devices": {
+    "computer": {
+      "numberSize": 48,
+      "titleSize": 136,
+      "headingSize": 56,
+      "hide": []
+    },
+    "tablet": {
+      "numberSize": 38,
+      "titleSize": 100,
+      "headingSize": 46,
+      "hide": []
+    },
+    "phone": {
+      "numberSize": 34,
+      "titleSize": 64,
+      "headingSize": 34,
+      "hide": []
+    }
+  },
   "clients": {
     "title": "Our latest projects & partners",
     "items": [
@@ -353,6 +373,5 @@
     "website": "www.CoBuiltSolutions.com",
     "tin": "",
     "copyright": "© 2026 CoBuilt Solutions. All rights reserved."
-  },
-  "statsSize": 48
+  }
 }

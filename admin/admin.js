@@ -16,9 +16,10 @@
       T('line1', 'Big title — line 1'), T('line2', 'Big title — line 2'), TA('text', 'Intro text'), T('buttonText', 'Main button text'),
       { k: 'showLogos', t: 'bool', l: 'Show client logos under the buttons' }, { k: 'logoCount', t: 'number', l: 'How many client logos to show there', h: 'The first logos from "Client logos" are used.' }] },
     { key: 'stats', label: 'Key figures', desc: 'The numbers that count up under the top section.',
-      extra: [{ k: 'statsSize', t: 'range', l: 'Number size', min: 24, max: 96, step: 2, unit: 'px', def: 42, h: 'Drag to make the numbers bigger or smaller. On phones they shrink automatically if needed to fit.' }],
+      note: 'To change how big the numbers are on computer, tablet or phone, open "Phone, tablet & computer".',
       list: { add: 'Add figure', title: 'Figure', fields: [
       { k: 'value', t: 'number', l: 'Number' }, T('suffix', 'After the number', 'e.g. " m³/h", "+" — include a space if needed'), T('label', 'Label')] } },
+    { key: 'devices', label: 'Phone, tablet & computer', desc: 'Different sizes and sections for each kind of screen. Use Preview to check each device.', custom: function (main) { devicesEditor(main); } },
     { key: 'clients', label: 'Client logos', desc: 'Logos on white tiles that scroll across the page. Upload a PNG or JPG of each logo.', fields: [
       T('title', 'Heading'),
       { k: 'items', t: 'list', add: 'Add logo', title: 'Logo', fields: [T('name', 'Company name'), IMG('image', 'Logo', 'logo')] }] },
@@ -135,6 +136,8 @@
     return gh('/contents/content.json?ref=' + encodeURIComponent(S.branch)).then(function (f) {
       S.content = JSON.parse(b64decodeUtf8(f.content));
       S.published = JSON.stringify(S.content);
+      ensureDevices();
+      if (JSON.stringify(S.content) !== S.published) setTimeout(changed, 0);
     });
   }
 
@@ -206,7 +209,9 @@
     $('statusText').textContent = v ? 'Unpublished changes' : 'All changes published';
   }
   var draftT;
+  var liveT;
   function changed() {
+    clearTimeout(liveT); liveT = setTimeout(function () { sendPreview(true); }, 250);
     setDirty(JSON.stringify(S.content) !== S.published);
     clearTimeout(draftT); draftT = setTimeout(saveDraft, 400);
   }
@@ -258,7 +263,9 @@
     main.appendChild(el('div', { class: 'mob-nav' }, [el('label', { class: 'lbl', text: 'Section' }), sel]));
     main.appendChild(el('h2', { text: s.label }));
     main.appendChild(el('p', { class: 'desc', text: s.desc }));
-    if (s.extra) s.extra.forEach(function (f) { main.appendChild(field(S.content, f)); });
+    if (s.note) main.appendChild(el('p', { class: 'hint', style: 'margin:-12px 0 22px', html: '💡 ' + s.note.replace(/"([^"]+)"/, '<a href="#" data-go="devices">$1</a>') }));
+    var go = main.querySelector('[data-go]'); if (go) go.addEventListener('click', function (e) { e.preventDefault(); S.current = 'devices'; renderNav(); renderSection(); });
+    if (s.custom) { s.custom(main); return; }
     if (s.list) {
       if (!Array.isArray(S.content[s.key])) S.content[s.key] = [];
       main.appendChild(listField(S.content, s.key, s.list));
@@ -293,7 +300,7 @@
       var cur = obj[f.k] == null ? f.def : Number(obj[f.k]);
       var rg = el('input', { id: id, type: 'range', min: f.min, max: f.max, step: f.step || 1, style: 'flex:1;accent-color:var(--accent);min-height:44px' });
       var out = el('b', { style: 'min-width:64px;text-align:right;font-size:15px' });
-      var demo = el('div', { text: '1,500', style: 'font-family:Oswald,sans-serif;font-weight:600;color:#fff;line-height:1.1;margin-top:10px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 8px 8px 0;overflow:hidden;white-space:nowrap' });
+      var demo = el('div', { text: f.sample || '1,500', style: 'font-family:' + (f.font || 'Oswald,sans-serif') + ';font-weight:600;color:#fff;line-height:1.1;margin-top:10px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 8px 8px 0;overflow:hidden;white-space:nowrap' });
       function upd() { out.textContent = rg.value + (f.unit || ''); demo.style.fontSize = rg.value + 'px'; }
       rg.value = cur; upd();
       rg.addEventListener('input', function () { obj[f.k] = Number(rg.value); upd(); changed(); });
@@ -402,17 +409,120 @@
     return box;
   }
 
+  /* ================= devices ================= */
+  var DEVICES = [
+    { k: 'computer', l: 'Computer', icon: '', w: 1280, size: 'wider than 1024 px' },
+    { k: 'tablet', l: 'Tablet', icon: '', w: 820, size: '641 – 1024 px' },
+    { k: 'phone', l: 'Phone', icon: '', w: 390, size: 'up to 640 px' }
+  ];
+  var DEV_DEFAULTS = {
+    computer: { numberSize: 42, titleSize: 136, headingSize: 56, hide: [] },
+    tablet: { numberSize: 38, titleSize: 100, headingSize: 46, hide: [] },
+    phone: { numberSize: 34, titleSize: 64, headingSize: 34, hide: [] }
+  };
+  var HIDE_OPTS = [
+    ['heroLogos', 'Client logos under the top buttons'], ['stats', 'Key figures'], ['clients', 'Scrolling client logos'], ['services', 'Services'],
+    ['plant', 'Batching plant'], ['lab', 'Laboratory'], ['grades', 'Mix grades & prices'], ['fleet', 'Truck banner'],
+    ['testimonials', 'Testimonials'], ['steps', 'How it works'], ['backToTop', 'Back-to-top button']
+  ];
+  function ensureDevices() {
+    var c = S.content;
+    if (!c.devices || typeof c.devices !== 'object') {
+      c.devices = clone(DEV_DEFAULTS);
+      if (c.statsSize) c.devices.computer.numberSize = c.statsSize;
+    }
+    delete c.statsSize;
+    DEVICES.forEach(function (d) {
+      var x = c.devices[d.k] = c.devices[d.k] || clone(DEV_DEFAULTS[d.k]);
+      Object.keys(DEV_DEFAULTS[d.k]).forEach(function (k) { if (x[k] == null) x[k] = clone(DEV_DEFAULTS[d.k][k]); });
+      if (!Array.isArray(x.hide)) x.hide = [];
+    });
+  }
+  var devTab = 'computer';
+  function devicesEditor(main) {
+    ensureDevices();
+    var tabs = el('div', { class: 'tabs', role: 'tablist' });
+    var body = el('div');
+    function draw() {
+      tabs.innerHTML = ''; body.innerHTML = '';
+      DEVICES.forEach(function (d) {
+        tabs.appendChild(el('button', { type: 'button', role: 'tab', 'aria-selected': d.k === devTab ? 'true' : 'false', class: 'tab' + (d.k === devTab ? ' on' : ''),
+          onclick: function () { devTab = d.k; draw(); if (pv.open) setDevice(d.k); } }, [el('span', { text: d.l })]));
+      });
+      var d = DEVICES.filter(function (x) { return x.k === devTab; })[0], x = S.content.devices[devTab];
+      body.appendChild(el('p', { class: 'hint', style: 'margin:0 0 20px', text: 'These settings apply to screens ' + d.size + ' wide.' }));
+      body.appendChild(el('h3', { class: 'sub-h', text: 'Sizes' }));
+      body.appendChild(field(x, { k: 'titleSize', t: 'range', l: 'Big title size ("READY MIX CONCRETE")', min: 36, max: 200, step: 2, unit: 'px', def: DEV_DEFAULTS[devTab].titleSize, sample: 'READY MIX', font: 'Anton, Oswald, sans-serif' }));
+      body.appendChild(field(x, { k: 'headingSize', t: 'range', l: 'Section title size', min: 22, max: 90, step: 2, unit: 'px', def: DEV_DEFAULTS[devTab].headingSize, sample: 'WE ARE WHAT YOU NEED' }));
+      body.appendChild(field(x, { k: 'numberSize', t: 'range', l: 'Key figure number size', min: 20, max: 120, step: 2, unit: 'px', def: DEV_DEFAULTS[devTab].numberSize, sample: '102,000 m³' }));
+      if (devTab !== 'computer') body.appendChild(el('p', { class: 'hint', style: 'margin:-8px 0 20px', text: 'On small screens text shrinks automatically if it would not fit, so nothing is ever cut off.' }));
+      body.appendChild(el('h3', { class: 'sub-h', text: 'Show on ' + d.l.toLowerCase() }));
+      var grid = el('div', { class: 'checks' });
+      var opts = HIDE_OPTS.slice(); if (devTab !== 'computer') opts.push(['callBar', 'Bottom "Call now / Get a quote" bar']);
+      opts.forEach(function (o) {
+        var id = 'h-' + devTab + '-' + o[0], cb = el('input', { type: 'checkbox', id: id });
+        cb.checked = x.hide.indexOf(o[0]) < 0;
+        cb.addEventListener('change', function () {
+          var i = x.hide.indexOf(o[0]);
+          if (cb.checked && i >= 0) x.hide.splice(i, 1); else if (!cb.checked && i < 0) x.hide.push(o[0]);
+          changed();
+        });
+        grid.appendChild(el('label', { class: 'toggle', for: id, style: 'margin:0' }, [cb, el('span', { text: o[1] })]));
+      });
+      body.appendChild(grid);
+      body.appendChild(el('div', { style: 'display:flex;gap:10px;flex-wrap:wrap;margin-top:24px' }, [
+        el('button', { class: 'btn primary', type: 'button', text: 'Preview on ' + d.l.toLowerCase(), onclick: function () { openPreview(devTab); } }),
+        el('button', { class: 'btn', type: 'button', text: 'Reset ' + d.l.toLowerCase() + ' settings', onclick: function () {
+          S.content.devices[devTab] = clone(DEV_DEFAULTS[devTab]); changed(); draw();
+        } })]));
+    }
+    draw();
+    main.append(tabs, body);
+  }
+
   /* ================= preview ================= */
-  function preview() {
+  var pv = { open: false, frame: null, ready: false, device: 'computer' };
+  function previewContent() {
     var c = clone(S.content);
     walkImages(c, function (o, k) { if (S.pending[o[k]]) o[k] = S.pending[o[k]].dataUrl; });
-    var w = window.open('/?preview=1', 'cobuilt-preview');
-    if (!w) { toast('Your browser blocked the preview window. Allow pop-ups for this site.', 'bad'); return; }
-    function onMsg(e) {
-      if (e.origin !== location.origin || !e.data || e.data.type !== 'cobuilt-preview-ready' || e.source !== w) return;
-      w.postMessage({ type: 'cobuilt-preview', content: c }, location.origin);
-    }
-    window.addEventListener('message', onMsg);
+    return c;
+  }
+  function sendPreview(keep) {
+    if (pv.open && pv.ready && pv.frame.contentWindow) pv.frame.contentWindow.postMessage({ type: 'cobuilt-preview', content: previewContent(), keepScroll: !!keep }, location.origin);
+  }
+  function fit() {
+    if (!pv.open) return;
+    var d = DEVICES.filter(function (x) { return x.k === pv.device; })[0];
+    var stage = $('pvStage'), aw = stage.clientWidth - 32, ah = stage.clientHeight - 32;
+    var sc = Math.min(1, aw / d.w);
+    var h = Math.round(ah / sc);
+    pv.frame.style.width = d.w + 'px'; pv.frame.style.height = h + 'px';
+    pv.frame.style.transform = 'scale(' + sc + ')';
+    $('pvBox').style.width = Math.round(d.w * sc) + 'px'; $('pvBox').style.height = Math.round(h * sc) + 'px';
+    $('pvInfo').textContent = d.l + ' · ' + d.w + ' px wide' + (sc < 1 ? ' · shown at ' + Math.round(sc * 100) + '%' : '');
+  }
+  function setDevice(k) {
+    pv.device = k;
+    document.querySelectorAll('[data-dev]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-dev') === k); b.setAttribute('aria-pressed', b.getAttribute('data-dev') === k ? 'true' : 'false'); });
+    fit();
+  }
+  function openPreview(device) {
+    pv.open = true; pv.ready = false;
+    $('pv').classList.add('on'); document.body.style.overflow = 'hidden';
+    pv.frame = $('pvFrame');
+    pv.frame.src = '/?preview=1&t=' + Date.now();
+    setDevice(device || pv.device);
+  }
+  function closePreview() { pv.open = false; $('pv').classList.remove('on'); document.body.style.overflow = ''; pv.frame.src = 'about:blank'; }
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || e.data.type !== 'cobuilt-preview-ready') return;
+    if (pv.open && pv.frame && e.source === pv.frame.contentWindow) { pv.ready = true; sendPreview(false); }
+    else if (pv.tab && e.source === pv.tab) pv.tab.postMessage({ type: 'cobuilt-preview', content: previewContent() }, location.origin);
+  });
+  window.addEventListener('resize', fit);
+  function previewTab() {
+    pv.tab = window.open('/?preview=1', 'cobuilt-preview');
+    if (!pv.tab) toast('Your browser blocked the preview window. Allow pop-ups for this site.', 'bad');
   }
 
   /* ================= more menu ================= */
@@ -421,7 +531,7 @@
     dialog('More options', 'Every publish is saved in GitHub history, so earlier versions can always be restored.', [
       { label: 'Discard unpublished changes', cls: 'danger', fn: function () {
         dialog('Discard changes?', 'This removes everything you changed since the last publish.', [{ label: 'Cancel' }, { label: 'Discard', cls: 'primary', fn: function () {
-          S.content = JSON.parse(S.published); S.pending = {}; clearDraft(); setDirty(false); renderNav(); renderSection(); toast('Changes discarded.');
+          S.content = JSON.parse(S.published); S.pending = {}; ensureDevices(); clearDraft(); setDirty(JSON.stringify(S.content) !== S.published); renderNav(); renderSection(); sendPreview(true); toast('Changes discarded.');
         } }]);
       } },
       { label: 'Publish history', fn: function () { window.open(url, '_blank', 'noopener'); } },
@@ -436,11 +546,14 @@
   $('signin').addEventListener('click', signIn);
   $('token').addEventListener('keydown', function (e) { if (e.key === 'Enter') signIn(); });
   $('publishBtn').addEventListener('click', publish);
-  $('previewBtn').addEventListener('click', preview);
+  $('previewBtn').addEventListener('click', function () { openPreview(); });
+  $('pvClose').addEventListener('click', closePreview);
+  $('pvTab').addEventListener('click', previewTab);
+  document.querySelectorAll('[data-dev]').forEach(function (b) { b.addEventListener('click', function () { setDevice(b.getAttribute('data-dev')); }); });
   $('moreBtn').addEventListener('click', more);
   $('overlay').addEventListener('click', function (e) { if (e.target === $('overlay')) $('overlay').classList.remove('on'); });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') $('overlay').classList.remove('on');
+    if (e.key === 'Escape') { if ($('overlay').classList.contains('on')) $('overlay').classList.remove('on'); else if (pv.open) closePreview(); }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && $('app').classList.contains('on')) { e.preventDefault(); publish(); }
   });
   window.addEventListener('beforeunload', function (e) { if (S.dirty) { saveDraft(); e.preventDefault(); e.returnValue = ''; } });

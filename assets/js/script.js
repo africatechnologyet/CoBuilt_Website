@@ -6,6 +6,7 @@
   var app = document.getElementById('app');
   var params = new URLSearchParams(location.search);
   var isPreview = params.get('preview') === '1';
+  var instant = false; // live preview updates: skip intro + count-up animations
 
   /* ---------- helpers ---------- */
   function esc(v) {
@@ -49,6 +50,28 @@
     wa: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3z"></path></svg>'
   };
 
+  /* ---------- per-device settings (phone / tablet / computer) ---------- */
+  var HIDE = {
+    heroLogos: '.hero .tiles', stats: '#stats', clients: '.clients', services: '#services', plant: '#plant-block', lab: '#lab-block',
+    grades: '#grades', fleet: '.fleet', testimonials: '#projects', steps: '#process', callBar: '.mbar', backToTop: '.totop'
+  };
+  var MEDIA = { phone: '(max-width:640px)', tablet: '(min-width:641px) and (max-width:1024px)', computer: '(min-width:1025px)' };
+  function px(v, lo, hi) { v = Number(v); return isFinite(v) && v > 0 ? Math.min(hi, Math.max(lo, v)) + 'px' : ''; }
+  function deviceStyles(c) {
+    var d = c.devices || {}, css = '';
+    if (!c.devices && c.statsSize) d = { computer: { numberSize: c.statsSize } };
+    Object.keys(MEDIA).forEach(function (k) {
+      var x = d[k]; if (!x) return;
+      var vars = [], n = px(x.numberSize, 16, 160), t = px(x.titleSize, 30, 220), h = px(x.headingSize, 20, 100);
+      if (n) vars.push('--stat-size:' + n); if (t) vars.push('--t1:' + t); if (h) vars.push('--h2:' + h);
+      var hide = (Array.isArray(x.hide) ? x.hide : []).map(function (key) { return HIDE[key]; }).filter(Boolean);
+      if (vars.length || hide.length) css += '@media ' + MEDIA[k] + '{' + (vars.length ? ':root{' + vars.join(';') + '}' : '') + (hide.length ? hide.join(',') + '{display:none !important}' : '') + '}';
+    });
+    var tag = document.getElementById('device-style');
+    if (!tag) { tag = document.createElement('style'); tag.id = 'device-style'; document.head.appendChild(tag); }
+    tag.textContent = css;
+  }
+
   /* ---------- render ---------- */
   function render(c) {
     var b = c.brand || {}, h = c.hero || {}, ct = c.contact || {}, f = c.footer || {};
@@ -58,8 +81,7 @@
     if (b.background) root.setProperty('--bg-img', 'url("' + abs(b.background) + '")');
     if (b.letterTexture) root.setProperty('--letter-img', 'url("' + abs(b.letterTexture) + '")');
     if (c.meta && c.meta.title) document.title = c.meta.title;
-    var ss = Number(c.statsSize);
-    if (isFinite(ss) && ss > 0) root.setProperty('--stat-size', Math.min(160, Math.max(16, ss)) + 'px'); else root.removeProperty('--stat-size');
+    deviceStyles(c);
     var phone1 = arr(ct.phones)[0] || '';
     var clients = arr(c.clients && c.clients.items);
     var nav = [];
@@ -69,7 +91,7 @@
     if (shown(c.testimonials)) nav.push(['#projects', 'Projects']);
 
     var html = '';
-    if (isPreview) html += '<div class="preview-bar">Preview — not published yet. Close this tab to keep editing.</div>';
+    if (isPreview && window.parent === window) html += '<div class="preview-bar">Preview — not published yet. Close this tab to keep editing.</div>';
 
     /* header */
     html += '<header class="top"><div class="wrap hdr">' +
@@ -123,13 +145,13 @@
     if (shown(pl) || shown(lb)) {
       html += '<section class="sec panel" id="plant"><div class="wrap" style="display:flex;flex-direction:column;gap:96px">';
       if (shown(pl)) {
-        html += '<div class="split"><div class="zoom reveal" style="height:460px"><img src="' + url(pl.image) + '" alt="' + esc(pl.title + ' ' + (pl.highlight || '')) + '" loading="lazy" style="object-position:30% center">' +
+        html += '<div class="split" id="plant-block"><div class="zoom reveal" style="height:460px"><img src="' + url(pl.image) + '" alt="' + esc(pl.title + ' ' + (pl.highlight || '')) + '" loading="lazy" style="object-position:30% center">' +
           (pl.badgeValue ? '<div class="badge">' + SVG.drum + '<div><b>' + esc(pl.badgeValue) + '</b><span>' + esc(pl.badgeLabel) + '</span></div></div>' : '') + '</div>' +
           '<div class="txt reveal"><span class="eyebrow">' + esc(pl.eyebrow) + '</span><h2 class="h2">' + esc(pl.title) + ' <em>' + esc(pl.highlight) + '</em></h2><p class="sub">' + esc(pl.text) + '</p>' +
           '<ul class="checks">' + arr(pl.features).map(function (x) { return '<li><i>' + SVG.check + '</i>' + esc(x) + '</li>'; }).join('') + '</ul></div></div>';
       }
       if (shown(lb)) {
-        html += '<div class="split rev"><div class="txt reveal"><span class="eyebrow">' + esc(lb.eyebrow) + '</span><h2 class="h2">' + esc(lb.title) + ' <em>' + esc(lb.highlight) + '</em></h2><p class="sub">' + esc(lb.text) + '</p>' +
+        html += '<div class="split rev" id="lab-block"><div class="txt reveal"><span class="eyebrow">' + esc(lb.eyebrow) + '</span><h2 class="h2">' + esc(lb.title) + ' <em>' + esc(lb.highlight) + '</em></h2><p class="sub">' + esc(lb.text) + '</p>' +
           '<div class="mats">' + arr(lb.materials).map(function (m) { return '<div><b>' + esc(m.name) + '</b><span>' + esc(m.note) + '</span></div>'; }).join('') + '</div></div>' +
           '<div class="zoom reveal" style="height:520px"><img src="' + url(lb.image) + '" alt="' + esc(lb.eyebrow) + '" loading="lazy"></div></div>';
       }
@@ -176,7 +198,7 @@
     /* contact + quote form */
     var grades = arr(ct.formGrades).length ? arr(ct.formGrades) : ['C25', 'C30', 'Other'];
     html += '<section class="sec" id="quote"><div class="wrap contact">' +
-      '<div class="txt reveal"><span class="eyebrow">' + esc(ct.eyebrow) + '</span><h2 class="h2" style="color:var(--accent);font-size:clamp(40px,6vw,60px)">' + esc(ct.title) + '</h2>' +
+      '<div class="txt reveal"><span class="eyebrow">' + esc(ct.eyebrow) + '</span><h2 class="h2 big" style="color:var(--accent)">' + esc(ct.title) + '</h2>' +
       (ct.text ? '<p class="sub">' + esc(ct.text) + '</p>' : '') +
       '<div class="phones">' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') + '</div>' +
       '<div class="cinfo">' + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div>' +
@@ -256,7 +278,7 @@
     var counters = document.querySelectorAll('[data-count]');
     function countUp(el) {
       var target = Number(el.getAttribute('data-count')), start = null;
-      if (reduce) { el.textContent = target.toLocaleString('en-US'); return; }
+      if (reduce || instant) { el.textContent = target.toLocaleString('en-US'); return; }
       function step(t) {
         if (!start) start = t;
         var p = Math.min(1, (t - start) / 1800), e = 1 - Math.pow(1 - p, 3);
@@ -273,7 +295,7 @@
           io.unobserve(en.target);
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-      reveals.forEach(function (el) { io.observe(el); });
+      if (instant) reveals.forEach(function (el) { el.classList.add('in'); }); else reveals.forEach(function (el) { io.observe(el); });
       counters.forEach(function (el) { io.observe(el); });
     } else {
       reveals.forEach(function (el) { el.classList.add('in'); });
@@ -346,13 +368,18 @@
   }
 
   /* ---------- boot ---------- */
-  if (isPreview && window.opener) {
+  var host = isPreview ? (window.parent !== window ? window.parent : window.opener) : null;
+  if (host) {
+    var keepY = 0;
     window.addEventListener('message', function (e) {
       if (e.origin !== location.origin || !e.data || e.data.type !== 'cobuilt-preview') return;
+      keepY = window.scrollY; instant = !!e.data.keepScroll;
+      document.documentElement.classList.toggle('no-intro', instant);
       try { render(e.data.content); } catch (x) { console.error(x); fail(); }
+      if (e.data.keepScroll) window.scrollTo(0, keepY);
       done();
     });
-    window.opener.postMessage({ type: 'cobuilt-preview-ready' }, location.origin);
+    host.postMessage({ type: 'cobuilt-preview-ready' }, location.origin);
   } else {
     fetch('content.json?v=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })

@@ -102,6 +102,27 @@ label.lbl{display:block;font-size:13px;font-weight:600;color:var(--muted);margin
 .spin{width:18px;height:18px;border:2px solid rgba(0,0,0,.25);border-top-color:#0D0D0F;border-radius:50%;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 
+
+/* device tabs */
+.tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;margin-bottom:22px}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-weight:600;font-size:15px;cursor:pointer}
+.tab:hover{color:var(--text)}
+.tab.on{background:var(--accent);color:#0D0D0F}
+.sub-h{font-size:18px;margin:8px 0 14px;color:var(--text)}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+/* preview panel */
+.pv{position:fixed;inset:0;z-index:70;background:#08080A;display:none;flex-direction:column}
+.pv.on{display:flex}
+.pv-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--bg)}
+.pv-bar b{font-family:Oswald,sans-serif;font-size:18px;margin-right:6px}
+.seg{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px}
+.seg button{min-height:38px;padding:6px 14px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-weight:600;cursor:pointer}
+.seg button.on{background:var(--accent);color:#0D0D0F}
+.pv-info{font-size:13px;color:var(--muted);margin-right:auto}
+.pv-stage{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px}
+.pv-box{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 0 0 8px #1F1F23,0 30px 80px rgba(0,0,0,.6);background:#0D0D0F;flex:none}
+.pv-box iframe{position:absolute;top:0;left:0;border:0;transform-origin:0 0;background:#0D0D0F}
+@media (max-width:820px){.pv-info{display:none}.seg button{padding:6px 10px}}
 @media (max-width:820px){
   .side{display:none}
   .mob-nav{display:block}
@@ -149,6 +170,22 @@ label.lbl{display:block;font-size:13px;font-weight:600;color:var(--muted);margin
     <nav class="side" id="side" aria-label="Sections"></nav>
     <main class="main" id="main"></main>
   </div>
+</div>
+
+<!-- Device preview -->
+<div class="pv" id="pv" role="dialog" aria-modal="true" aria-label="Website preview">
+  <div class="pv-bar">
+    <b>Preview</b>
+    <div class="seg" role="group" aria-label="Device">
+      <button type="button" data-dev="computer">Computer</button>
+      <button type="button" data-dev="tablet">Tablet</button>
+      <button type="button" data-dev="phone">Phone</button>
+    </div>
+    <span class="pv-info" id="pvInfo"></span>
+    <button class="btn" id="pvTab" type="button">Open in new tab</button>
+    <button class="btn primary" id="pvClose" type="button">Close preview</button>
+  </div>
+  <div class="pv-stage" id="pvStage"><div class="pv-box" id="pvBox"><iframe id="pvFrame" title="Website preview"></iframe></div></div>
 </div>
 
 <!-- Dialog -->
