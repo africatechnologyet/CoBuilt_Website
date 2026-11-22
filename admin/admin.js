@@ -249,7 +249,7 @@
   }
 
   /* ================= pictures ================= */
-  var MAX = { photo: 1800, wide: 2000, bg: 2000, logo: 480 };
+  var MAX = { photo: 1400, wide: 1800, bg: 1800, logo: 480 };
   function processImage(file, kind) {
     return new Promise(function (resolve, reject) {
       if (!/^image\//.test(file.type)) { reject(new Error('Please choose a picture file (JPG or PNG).')); return; }
@@ -268,7 +268,7 @@
           else cx.clearRect(0, 0, cw, ch);
           cx.drawImage(img, 0, 0, cw, ch);
           // WebP is 60–75% smaller than JPG/PNG; fall back if this browser cannot make WebP
-          var dataUrl = cv.toDataURL('image/webp', png ? 0.9 : 0.8), ext = 'webp';
+          var dataUrl = cv.toDataURL('image/webp', png ? 0.9 : 0.74), ext = 'webp';
           if (dataUrl.indexOf('data:image/webp') !== 0) { dataUrl = png ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.85); ext = png ? 'png' : 'jpg'; }
           resolve({ dataUrl: dataUrl, b64: dataUrl.split(',')[1], ext: ext, w: cw, h: ch });
         };
