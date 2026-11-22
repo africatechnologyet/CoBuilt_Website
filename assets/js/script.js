@@ -102,6 +102,7 @@
     if (b.background) root.setProperty('--bg-img', 'url("' + abs(b.background) + '")');
     if (b.letterTexture) root.setProperty('--letter-img', 'url("' + abs(b.letterTexture) + '")');
     if (c.meta && c.meta.title) document.title = c.meta.title;
+    if (c.meta && c.meta.description) { var md = document.querySelector('meta[name="description"]'); if (md) md.setAttribute('content', c.meta.description); }
     deviceStyles(c);
     var phone1 = arr(ct.phones)[0] || '';
     var clients = arr(c.clients && c.clients.items);
