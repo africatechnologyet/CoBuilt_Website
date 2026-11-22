@@ -165,7 +165,7 @@
     }).then(function () {
       S.pending = {}; S.published = JSON.stringify(S.content); setDirty(false); clearDraft();
       dialog('Published!', 'Your changes are saved. The live website updates in about 1–2 minutes (Render rebuilds it automatically).', [
-        { label: 'Close' }, { label: 'View website', cls: 'primary', fn: function () { window.open('../', '_blank', 'noopener'); } }]);
+        { label: 'Close' }, { label: 'View website', cls: 'primary', fn: function () { window.open('/', '_blank', 'noopener'); } }]);
     }).catch(function (e) {
       toast(friendly(e), 'bad');
     }).then(function () { btn.disabled = false; btn.textContent = 'Publish'; renderSection(); });
@@ -236,7 +236,7 @@
     });
   }
   function slug(s) { return String(s || 'image').toLowerCase().replace(/\.[a-z0-9]+$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'image'; }
-  function imgSrc(p) { return S.pending[p] ? S.pending[p].dataUrl : (p ? '../' + p : ''); }
+  function imgSrc(p) { return S.pending[p] ? S.pending[p].dataUrl : (p ? '/' + p : ''); }
 
   /* ================= form rendering ================= */
   function renderNav() {
@@ -393,7 +393,7 @@
   function preview() {
     var c = clone(S.content);
     walkImages(c, function (o, k) { if (S.pending[o[k]]) o[k] = S.pending[o[k]].dataUrl; });
-    var w = window.open('../?preview=1', 'cobuilt-preview');
+    var w = window.open('/?preview=1', 'cobuilt-preview');
     if (!w) { toast('Your browser blocked the preview window. Allow pop-ups for this site.', 'bad'); return; }
     function onMsg(e) {
       if (e.origin !== location.origin || !e.data || e.data.type !== 'cobuilt-preview-ready' || e.source !== w) return;
