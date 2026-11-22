@@ -19,7 +19,7 @@
     "showLogos": true,
     "logoCount": 12,
     "backgroundVideo": "assets/video/uploads/hero-optimized.mp4",
-    "videoOnPhones": true
+    "videoOnPhones": false
   },
   "stats": [
     {
