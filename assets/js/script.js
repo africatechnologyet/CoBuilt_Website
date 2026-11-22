@@ -433,7 +433,7 @@
         'Pump needed: ' + (d.get('pump') ? 'Yes' : 'No')
       ].join('\n');
       if (via === 'mail' && c.contact.email) {
-        location.href = 'mailto:' + c.contact.email + '?subject=' + encodeURIComponent('Concrete quote request — ' + grade) + '&body=' + encodeURIComponent(lines);
+        location.href = 'mailto:' + c.contact.email + '?subject=' + encodeURIComponent('Concrete quote request: ' + grade) + '&body=' + encodeURIComponent(lines);
       } else {
         var n = String(c.contact.whatsapp || '').replace(/\D/g, '');
         window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(lines), '_blank', 'noopener');
