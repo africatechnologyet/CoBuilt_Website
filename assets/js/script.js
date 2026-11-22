@@ -58,6 +58,8 @@
     if (b.background) root.setProperty('--bg-img', 'url("' + abs(b.background) + '")');
     if (b.letterTexture) root.setProperty('--letter-img', 'url("' + abs(b.letterTexture) + '")');
     if (c.meta && c.meta.title) document.title = c.meta.title;
+    var ss = Number(c.statsSize);
+    if (isFinite(ss) && ss > 0) root.setProperty('--stat-size', Math.min(160, Math.max(16, ss)) + 'px'); else root.removeProperty('--stat-size');
     var phone1 = arr(ct.phones)[0] || '';
     var clients = arr(c.clients && c.clients.items);
     var nav = [];

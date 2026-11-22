@@ -15,7 +15,9 @@
     { key: 'hero', label: 'Top of page', desc: 'The big "READY MIX CONCRETE" area visitors see first.', fields: [
       T('line1', 'Big title — line 1'), T('line2', 'Big title — line 2'), TA('text', 'Intro text'), T('buttonText', 'Main button text'),
       { k: 'showLogos', t: 'bool', l: 'Show client logos under the buttons' }, { k: 'logoCount', t: 'number', l: 'How many client logos to show there', h: 'The first logos from "Client logos" are used.' }] },
-    { key: 'stats', label: 'Key figures', desc: 'The numbers that count up under the top section.', list: { add: 'Add figure', title: 'Figure', fields: [
+    { key: 'stats', label: 'Key figures', desc: 'The numbers that count up under the top section.',
+      extra: [{ k: 'statsSize', t: 'range', l: 'Number size', min: 24, max: 96, step: 2, unit: 'px', def: 42, h: 'Drag to make the numbers bigger or smaller. On phones they shrink automatically if needed to fit.' }],
+      list: { add: 'Add figure', title: 'Figure', fields: [
       { k: 'value', t: 'number', l: 'Number' }, T('suffix', 'After the number', 'e.g. " m³/h", "+" — include a space if needed'), T('label', 'Label')] } },
     { key: 'clients', label: 'Client logos', desc: 'Logos on white tiles that scroll across the page. Upload a PNG or JPG of each logo.', fields: [
       T('title', 'Heading'),
@@ -256,6 +258,7 @@
     main.appendChild(el('div', { class: 'mob-nav' }, [el('label', { class: 'lbl', text: 'Section' }), sel]));
     main.appendChild(el('h2', { text: s.label }));
     main.appendChild(el('p', { class: 'desc', text: s.desc }));
+    if (s.extra) s.extra.forEach(function (f) { main.appendChild(field(S.content, f)); });
     if (s.list) {
       if (!Array.isArray(S.content[s.key])) S.content[s.key] = [];
       main.appendChild(listField(S.content, s.key, s.list));
@@ -286,6 +289,16 @@
       inp.value = obj[f.k] == null ? '' : obj[f.k];
       inp.addEventListener('input', function () { obj[f.k] = f.t === 'number' ? (inp.value === '' ? 0 : Number(inp.value)) : inp.value; changed(); });
       wrap.append(lab, inp);
+    } else if (f.t === 'range') {
+      var cur = obj[f.k] == null ? f.def : Number(obj[f.k]);
+      var rg = el('input', { id: id, type: 'range', min: f.min, max: f.max, step: f.step || 1, style: 'flex:1;accent-color:var(--accent);min-height:44px' });
+      var out = el('b', { style: 'min-width:64px;text-align:right;font-size:15px' });
+      var demo = el('div', { text: '1,500', style: 'font-family:Oswald,sans-serif;font-weight:600;color:#fff;line-height:1.1;margin-top:10px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 8px 8px 0;overflow:hidden;white-space:nowrap' });
+      function upd() { out.textContent = rg.value + (f.unit || ''); demo.style.fontSize = rg.value + 'px'; }
+      rg.value = cur; upd();
+      rg.addEventListener('input', function () { obj[f.k] = Number(rg.value); upd(); changed(); });
+      var reset = el('button', { class: 'btn sm', type: 'button', text: 'Reset', onclick: function () { rg.value = f.def; obj[f.k] = f.def; upd(); changed(); } });
+      wrap.append(lab, el('div', { class: 'color' }, [rg, out, reset]), demo);
     } else if (f.t === 'textarea') {
       var ta = el('textarea', { id: id }); ta.value = obj[f.k] || '';
       ta.addEventListener('input', function () { obj[f.k] = ta.value; changed(); });
