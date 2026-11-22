@@ -72,7 +72,8 @@
       var vars = [], n = px(x.numberSize, 16, 160), t = px(x.titleSize, 30, 220), h = px(x.headingSize, 20, 100);
       if (n) vars.push('--stat-size:' + n); if (t) vars.push('--t1:' + t); if (h) vars.push('--h2:' + h);
       var hide = (Array.isArray(x.hide) ? x.hide : []).map(function (key) { return HIDE[key]; }).filter(Boolean);
-      if (vars.length || hide.length) css += '@media ' + MEDIA[k] + '{' + (vars.length ? ':root{' + vars.join(';') + '}' : '') + (hide.length ? hide.join(',') + '{display:none !important}' : '') + '}';
+      var extra = (Array.isArray(x.hide) && x.hide.indexOf('callBar') > -1) ? '.totop{bottom:calc(24px + env(safe-area-inset-bottom)) !important}footer .wrap{padding-bottom:40px !important}' : '';
+      if (vars.length || hide.length) css += '@media ' + MEDIA[k] + '{' + (vars.length ? ':root{' + vars.join(';') + '}' : '') + (hide.length ? hide.join(',') + '{display:none !important}' : '') + extra + '}';
     });
     var tag = document.getElementById('device-style');
     if (!tag) { tag = document.createElement('style'); tag.id = 'device-style'; document.head.appendChild(tag); }

@@ -54,13 +54,17 @@
       "numberSize": 38,
       "titleSize": 100,
       "headingSize": 46,
-      "hide": []
+      "hide": [
+        "callBar"
+      ]
     },
     "phone": {
       "numberSize": 44,
       "titleSize": 64,
       "headingSize": 34,
-      "hide": []
+      "hide": [
+        "callBar"
+      ]
     }
   },
   "clients": {
