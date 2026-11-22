@@ -247,6 +247,9 @@ footer .wrap{position:relative;padding-top:72px;padding-bottom:40px;display:flex
   .mbar a:active{transform:scale(.96)}
   .mbar .call{border:1.5px solid #3A3A42;color:var(--text)}
   .mbar .q{background:var(--accent);color:#0D0D0F;text-transform:uppercase;letter-spacing:.5px}
+  .mbar{transition:transform .35s ease,opacity .35s ease}
+  .mbar.away{transform:translateY(110%);opacity:0;pointer-events:none}
+  .mbar.away~.totop,.totop:has(~.mbar.away){bottom:calc(24px + env(safe-area-inset-bottom))}
   .totop{bottom:calc(86px + env(safe-area-inset-bottom))}
   footer .wrap{padding-bottom:110px}
   .swipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:8px;scrollbar-width:none}

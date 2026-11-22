@@ -252,7 +252,7 @@
 
     /* floating */
     html += '<a href="#top" class="totop hide" id="totop" aria-label="Back to top">' + SVG.up + '</a>' +
-      '<div class="mbar">' + (phone1 ? '<a class="call" href="tel:' + digits(phone1) + '">' + SVG.phone + 'Call now</a>' : '') + '<a class="q" href="#quote">Get a quote</a></div>' +
+      '<div class="mbar away">' + (phone1 ? '<a class="call" href="tel:' + digits(phone1) + '">' + SVG.phone + 'Call now</a>' : '') + '<a class="q" href="#quote">Get a quote</a></div>' +
       '<div class="toast" id="toast" role="status"></div>';
 
     app.innerHTML = html;
@@ -360,12 +360,17 @@
     }
 
     // back to top visibility
-    var totop = document.getElementById('totop'), ticking = false;
+    var totop = document.getElementById('totop'), mbar = app.querySelector('.mbar'), hero = app.querySelector('.hero'), ticking = false;
     function onScroll() {
       if (ticking) return; ticking = true;
-      requestAnimationFrame(function () { totop.classList.toggle('hide', scrollY < 500); ticking = false; });
+      requestAnimationFrame(function () {
+        totop.classList.toggle('hide', scrollY < 500);
+        // bottom Call / Quote bar: hidden on the first screen (hero), shown once the visitor scrolls past it
+        if (mbar) mbar.classList.toggle('away', !hero || hero.getBoundingClientRect().bottom > innerHeight * 0.25);
+        ticking = false;
+      });
     }
-    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+    addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll, { passive: true }); onScroll();
 
     // grade chips + table links
     var form = document.getElementById('qform');
