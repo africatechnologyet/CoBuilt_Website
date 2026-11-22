@@ -17,8 +17,9 @@ p{margin:0}
 button,input{font:inherit}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.page{background:var(--bg) var(--bg-img) center top/cover}
-@media (hover:hover) and (min-width:1024px){.page{background-attachment:fixed}}
+/* background: a screen-sized fixed layer, so the photo is never stretched over the whole page (sharp on phones/tablets too) */
+.page{position:relative;isolation:isolate;background:transparent}
+.page::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--bg) var(--bg-img) center/cover no-repeat;pointer-events:none}
 
 /* loader */
 .loader{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
