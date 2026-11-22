@@ -381,6 +381,6 @@ footer .wrap{position:relative;padding-top:72px;padding-bottom:40px;display:flex
 @keyframes rowIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 @keyframes sweep{0%{left:-60%;opacity:1}100%{left:130%;opacity:1}}
 @keyframes depth{from{translate:0 -6%}to{translate:0 6%}}
-@keyframes heroAway{to{opacity:.15;translate:0 -70px;scale:.96}}
+@keyframes heroAway{to{translate:0 -40px}}
 @keyframes statGlow{from{text-shadow:none}to{text-shadow:0 0 28px rgba(240,110,34,.35)}}
 .no-intro .head.reveal .h2,.no-intro .txt.reveal .h2,.no-intro .zoom.reveal,.no-intro .zoom.reveal img,.no-intro .stat,.no-intro .table-box tr.row,.no-intro .head .eyebrow,.no-intro .head .sub,.no-intro .txt.reveal > *{transition:none !important;animation:none !important;clip-path:none !important;opacity:1 !important;transform:none !important}
