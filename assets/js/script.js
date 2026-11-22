@@ -1,4 +1,360 @@
+/* CoBuilt Solutions — public site
+   All text, lists and pictures come from /content.json, which the admin panel (/admin) edits. */
+(function () {
+  'use strict';
 
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("CoBuilt placeholder site loaded");
-});
+  var app = document.getElementById('app');
+  var params = new URLSearchParams(location.search);
+  var isPreview = params.get('preview') === '1';
+
+  /* ---------- helpers ---------- */
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function url(v) { return esc(String(v || '').replace(/^javascript:/i, '')); }
+  function arr(v) { return Array.isArray(v) ? v : []; }
+  function digits(v) { return String(v || '').replace(/[^\d+]/g, ''); }
+  function shown(sec) { return sec && sec.show !== false; }
+  function head(s, side) {
+    return '<div class="head reveal"><div>' +
+      (s.eyebrow ? '<span class="eyebrow">' + esc(s.eyebrow) + '</span>' : '') +
+      '<h2 class="h2">' + esc(s.title) + (s.highlight ? ' <em>' + esc(s.highlight) + '</em>' : '') + '</h2></div>' +
+      (side && s.text ? '<p class="sub">' + esc(s.text) + '</p>' : '') + '</div>';
+  }
+  var ICONS = {
+    truck: 'M3 17h11V7H3zM14 10h4l3 3v4h-7M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+    pump: 'M4 20h6M7 20V10l10-6 3 3M17 4v6',
+    pin: 'M12 22s-7-6-7-12a7 7 0 0 1 14 0c0 6-7 12-7 12zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+    lab: 'M9 3h6M10 3v6L5 19a1 1 0 0 0 1 2h12a1 1 0 0 0 1-2l-5-10V3',
+    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+    clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+    building: 'M3 21h18M5 21V7l7-4 7 4v14M9 9h1M14 9h1M9 13h1M14 13h1M9 17h1M14 17h1',
+    gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z'
+  };
+  function icon(name, size) {
+    return '<svg aria-hidden="true" width="' + (size || 26) + '" height="' + (size || 26) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="' + (ICONS[name] || ICONS.truck) + '"></path></svg>';
+  }
+  var SVG = {
+    arrow: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>',
+    down: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>',
+    up: '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg>',
+    check: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>',
+    menu: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>',
+    close: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>',
+    drum: '<svg class="drum" aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--accent)"><circle cx="12" cy="12" r="9"></circle><path d="M12 3c3 3 3 15 0 18M3 12c3-3 15-3 18 0"></path></svg>',
+    quote: '<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" style="fill:var(--accent)"><path d="M7 7h4v4c0 3-1.5 5-4 6l-.8-1.4C7.6 14.8 8.4 13.6 8.5 12H7zM14 7h4v4c0 3-1.5 5-4 6l-.8-1.4c1.4-.8 2.2-2 2.3-3.6H14z"></path></svg>',
+    phone: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>',
+    wa: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3z"></path></svg>'
+  };
+
+  /* ---------- render ---------- */
+  function render(c) {
+    var b = c.brand || {}, h = c.hero || {}, ct = c.contact || {}, f = c.footer || {};
+    var root = document.documentElement.style;
+    if (b.accent) root.setProperty('--accent', b.accent);
+    function abs(p) { try { return new URL(String(p), location.href).href.replace(/"/g, '%22'); } catch (e) { return ''; } }
+    if (b.background) root.setProperty('--bg-img', 'url("' + abs(b.background) + '")');
+    if (b.letterTexture) root.setProperty('--letter-img', 'url("' + abs(b.letterTexture) + '")');
+    if (c.meta && c.meta.title) document.title = c.meta.title;
+    var phone1 = arr(ct.phones)[0] || '';
+    var clients = arr(c.clients && c.clients.items);
+    var nav = [];
+    if (shown(c.services)) nav.push(['#services', 'Services']);
+    if (shown(c.plant) || shown(c.lab)) nav.push(['#plant', 'Plant & Lab']);
+    if (shown(c.grades)) nav.push(['#grades', 'Mix grades']);
+    if (shown(c.testimonials)) nav.push(['#projects', 'Projects']);
+
+    var html = '';
+    if (isPreview) html += '<div class="preview-bar">Preview — not published yet. Close this tab to keep editing.</div>';
+
+    /* header */
+    html += '<header class="top"><div class="wrap hdr">' +
+      '<a class="brand" href="#top"><img src="' + url(b.mark) + '" alt="' + esc(b.name) + ' Solutions"><span>' + esc(b.name) + '</span></a>' +
+      '<nav class="nav" aria-label="Main">' + nav.map(function (n) { return '<a class="link" href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') +
+      '<a class="btn btn-primary" href="#quote">Get a quote</a>' +
+      '<button type="button" class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav">' + SVG.menu + '</button></nav></div>' +
+      '<nav class="mnav" id="mnav" aria-label="Mobile">' + nav.map(function (n) { return '<a href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') + '<a href="#quote">Get a quote →</a></nav></header>';
+
+    /* hero */
+    var heroLogos = h.showLogos === false ? [] : clients.slice(0, h.logoCount || 6);
+    html += '<section class="hero" id="top"><div class="vignette"></div><div class="spot"></div><div class="hero-in">' +
+      '<div class="par" data-par="-14,-10"><img class="hero-logo" src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" width="686" height="720"></div>' +
+      '<h1 class="par" data-par="8,6"><span class="concrete l1">' + esc(h.line1) + '</span><span class="concrete l2">' + esc(h.line2) + '</span></h1>' +
+      '<span class="rule" aria-hidden="true"></span>' +
+      (h.text ? '<p class="lead">' + esc(h.text) + '</p>' : '') +
+      '<div class="cta"><a class="btn btn-primary btn-lg" href="#quote">' + esc(h.buttonText || 'Request a quote') + SVG.arrow + '</a>' +
+      (phone1 ? '<a class="btn btn-ghost btn-lg" href="tel:' + digits(phone1) + '" style="text-transform:none">' + esc(phone1) + '</a>' : '') + '</div>' +
+      (heroLogos.length ? '<div class="tiles">' + heroLogos.map(function (l, i) {
+        return '<span class="tile" style="animation-delay:' + (1.25 + i * 0.08).toFixed(2) + 's"><img src="' + url(l.image) + '" alt="' + esc(l.name) + '" loading="lazy"></span>';
+      }).join('') + '</div>' : '') +
+      '<a href="#stats" class="cue" aria-label="Scroll down">' + SVG.down + '</a></div></section>';
+
+    /* stats */
+    var stats = arr(c.stats);
+    if (stats.length) {
+      html += '<section class="stats" id="stats" aria-label="Key figures"><div class="wrap">' + stats.map(function (s) {
+        var n = Number(s.value);
+        var val = isFinite(n) ? '<span data-count="' + n + '">0</span>' : esc(s.value);
+        return '<div class="stat"><b>' + val + esc(s.suffix) + '</b><span>' + esc(s.label) + '</span></div>';
+      }).join('') + '</div></section>';
+    }
+
+    /* clients marquee */
+    if (clients.length) {
+      var tiles = clients.map(function (l) { return '<span class="tile"><img src="' + url(l.image) + '" alt="' + esc(l.name) + '" loading="lazy"></span>'; }).join('');
+      html += '<section class="clients" aria-label="Clients and partners"><span class="label">' + esc(c.clients.title) + '</span>' +
+        '<div class="marquee"><div class="track">' + tiles + tiles.replace(/alt="[^"]*"/g, 'alt="" aria-hidden="true"') + '</div></div></section>';
+    }
+
+    /* services */
+    var sv = c.services;
+    if (shown(sv)) {
+      html += '<section class="sec" id="services"><div class="wrap">' + head(sv, true) + '<div class="grid">' + arr(sv.items).map(function (it) {
+        return '<article class="card reveal"><div class="ic">' + icon(it.icon) + '</div><h3>' + esc(it.title) + '</h3><p>' + esc(it.text) + '</p></article>';
+      }).join('') + '</div></div></section>';
+    }
+
+    /* plant + lab */
+    var pl = c.plant, lb = c.lab;
+    if (shown(pl) || shown(lb)) {
+      html += '<section class="sec panel" id="plant"><div class="wrap" style="display:flex;flex-direction:column;gap:96px">';
+      if (shown(pl)) {
+        html += '<div class="split"><div class="zoom reveal" style="height:460px"><img src="' + url(pl.image) + '" alt="' + esc(pl.title + ' ' + (pl.highlight || '')) + '" loading="lazy" style="object-position:30% center">' +
+          (pl.badgeValue ? '<div class="badge">' + SVG.drum + '<div><b>' + esc(pl.badgeValue) + '</b><span>' + esc(pl.badgeLabel) + '</span></div></div>' : '') + '</div>' +
+          '<div class="txt reveal"><span class="eyebrow">' + esc(pl.eyebrow) + '</span><h2 class="h2">' + esc(pl.title) + ' <em>' + esc(pl.highlight) + '</em></h2><p class="sub">' + esc(pl.text) + '</p>' +
+          '<ul class="checks">' + arr(pl.features).map(function (x) { return '<li><i>' + SVG.check + '</i>' + esc(x) + '</li>'; }).join('') + '</ul></div></div>';
+      }
+      if (shown(lb)) {
+        html += '<div class="split rev"><div class="txt reveal"><span class="eyebrow">' + esc(lb.eyebrow) + '</span><h2 class="h2">' + esc(lb.title) + ' <em>' + esc(lb.highlight) + '</em></h2><p class="sub">' + esc(lb.text) + '</p>' +
+          '<div class="mats">' + arr(lb.materials).map(function (m) { return '<div><b>' + esc(m.name) + '</b><span>' + esc(m.note) + '</span></div>'; }).join('') + '</div></div>' +
+          '<div class="zoom reveal" style="height:520px"><img src="' + url(lb.image) + '" alt="' + esc(lb.eyebrow) + '" loading="lazy"></div></div>';
+      }
+      html += '</div></section>';
+    }
+
+    /* grades */
+    var gr = c.grades;
+    if (shown(gr)) {
+      html += '<section class="sec" id="grades"><div class="wrap">' +
+        '<div class="head reveal"><div><span class="eyebrow">' + esc(gr.eyebrow) + '</span><h2 class="h2">' + esc(gr.title) + ' <em>' + esc(gr.highlight) + '</em></h2>' + (gr.text ? '<p class="sub" style="max-width:680px">' + esc(gr.text) + '</p>' : '') + '</div></div>' +
+        '<div class="table-box reveal"><table><thead><tr><th scope="col">Grade</th><th scope="col">Strength</th><th scope="col">Typical use</th><th scope="col" style="text-align:right">Price / m³</th><th scope="col"><span class="sr">Action</span></th></tr></thead><tbody>' +
+        arr(gr.items).map(function (g) {
+          return '<tr class="row"><td class="g">' + esc(g.name) + '</td><td class="s">' + esc(g.strength) + '</td><td class="u">' + esc(g.use) + '</td><td class="p">' + esc(g.price) + '</td>' +
+            '<td class="a"><a class="row-link" href="#quote" data-grade="' + esc(g.name) + '">Get quote →</a></td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        (arr(gr.testedBy).length ? '<div class="tested reveal"><b>' + esc(gr.testedByTitle) + '</b>' + arr(gr.testedBy).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
+        '</div></section>';
+    }
+
+    /* fleet */
+    var fl = c.fleet;
+    if (shown(fl)) {
+      html += '<section class="fleet" aria-label="' + esc(fl.eyebrow) + '"><div class="zoom"><img src="' + url(fl.image) + '" alt="' + esc(fl.eyebrow) + '" loading="lazy" style="object-position:center 35%"></div><div class="ov"></div>' +
+        '<div class="wrap reveal"><span class="eyebrow">' + esc(fl.eyebrow) + '</span><h2 class="h2">' + esc(fl.title) + ' <em>' + esc(fl.highlight) + '</em></h2><p class="sub">' + esc(fl.text) + '</p></div></section>';
+    }
+
+    /* testimonials */
+    var ts = c.testimonials;
+    if (shown(ts)) {
+      html += '<section class="sec" id="projects"><div class="wrap">' + head(ts, true) + '<div class="grid swipe">' + arr(ts.items).map(function (t) {
+        return '<figure class="card quote reveal">' + SVG.quote + '<blockquote>' + esc(t.quote) + '</blockquote><figcaption><b>' + esc(t.who) + '</b><span>' + esc(t.project) + '</span></figcaption></figure>';
+      }).join('') + '</div></div></section>';
+    }
+
+    /* steps */
+    var sp = c.steps;
+    if (shown(sp)) {
+      html += '<section class="sec panel" id="process"><div class="wrap">' + head(sp, false) + '<ol class="steps">' + arr(sp.items).map(function (s, i) {
+        return '<li class="reveal"><span class="n">' + String(i + 1).padStart(2, '0') + '</span><h3>' + esc(s.title) + '</h3><p>' + esc(s.text) + '</p></li>';
+      }).join('') + '</ol></div></section>';
+    }
+
+    /* contact + quote form */
+    var grades = arr(ct.formGrades).length ? arr(ct.formGrades) : ['C25', 'C30', 'Other'];
+    html += '<section class="sec" id="quote"><div class="wrap contact">' +
+      '<div class="txt reveal"><span class="eyebrow">' + esc(ct.eyebrow) + '</span><h2 class="h2" style="color:var(--accent);font-size:clamp(40px,6vw,60px)">' + esc(ct.title) + '</h2>' +
+      (ct.text ? '<p class="sub">' + esc(ct.text) + '</p>' : '') +
+      '<div class="phones">' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') + '</div>' +
+      '<div class="cinfo">' + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div>' +
+      '<form class="quote-form reveal" id="qform" novalidate>' +
+      '<div class="f2"><label class="f">Full name<input name="name" type="text" autocomplete="name" placeholder="Your name"></label>' +
+      '<label class="f">Phone<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+251 …" required></label></div>' +
+      '<fieldset><legend>Concrete grade</legend><div class="chips">' + grades.map(function (g, i) {
+        return '<button type="button" class="chip" data-chip="' + esc(g) + '" aria-pressed="' + (i === Math.min(2, grades.length - 1) ? 'true' : 'false') + '">' + esc(g) + '</button>';
+      }).join('') + '</div></fieldset>' +
+      '<div class="f2"><label class="f">Volume (m³)<input name="volume" type="number" min="1" inputmode="numeric" placeholder="e.g. 30"></label>' +
+      '<label class="f">Pour date<input name="date" type="date"></label></div>' +
+      '<label class="f">Site location<input name="site" type="text" placeholder="Sub-city, woreda or landmark"></label>' +
+      '<label class="check"><input name="pump" type="checkbox"> I also need a concrete pump</label>' +
+      '<p class="err" id="qerr" role="alert"></p>' +
+      '<div class="send">' + (ct.whatsapp ? '<button type="submit" class="btn btn-primary btn-lg" data-via="wa">' + SVG.wa + 'Send on WhatsApp</button>' : '') +
+      (ct.email ? '<button type="submit" class="btn btn-ghost btn-lg" data-via="mail" style="text-transform:none">Send by email</button>' : '') + '</div>' +
+      '<p class="note">Your request opens in WhatsApp or your email app, ready to send.</p></form></div></section>';
+
+    /* footer */
+    html += '<footer class="foot"><div class="wrap"><div class="fgrid"><div><img src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" style="width:96px;height:auto">' +
+      '<p class="ftag">' + esc(f.tagline) + ' <b>' + esc(f.taglineBold) + '</b></p></div>' +
+      '<div class="fcols"><div><h4>Company</h4>' + nav.map(function (n) { return '<a href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') + '</div>' +
+      '<div><h4>Contact</h4>' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') +
+      (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div></div>' +
+      '<div class="fbot"><span>' + esc(f.copyright) + '</span><span><em>' + esc(f.website) + '</em>' + (f.tin ? ' · ' + esc(f.tin) : '') + '</span></div></div></footer>';
+
+    /* floating */
+    html += '<a href="#top" class="totop hide" id="totop" aria-label="Back to top">' + SVG.up + '</a>' +
+      '<div class="mbar">' + (phone1 ? '<a class="call" href="tel:' + digits(phone1) + '">' + SVG.phone + 'Call now</a>' : '') + '<a class="q" href="#quote">Get a quote</a></div>' +
+      '<div class="toast" id="toast" role="status"></div>';
+
+    app.innerHTML = html;
+    wire(c);
+  }
+
+  /* ---------- interactions ---------- */
+  function wire(c) {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // mobile menu
+    var burger = document.getElementById('burger'), mnav = document.getElementById('mnav');
+    function setMenu(open) {
+      mnav.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      burger.innerHTML = open ? SVG.close : SVG.menu;
+    }
+    burger.addEventListener('click', function () { setMenu(!mnav.classList.contains('open')); });
+    mnav.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+    window.addEventListener('resize', function () { if (innerWidth > 860) setMenu(false); });
+
+    // hero spotlight + parallax (mouse only)
+    var hero = document.querySelector('.hero'), pars = hero.querySelectorAll('[data-par]'), raf = 0;
+    if (!reduce) {
+      hero.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        var r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(function () {
+          hero.classList.add('hovering');
+          hero.style.setProperty('--sx', (x * 100).toFixed(1) + '%');
+          hero.style.setProperty('--sy', (y * 100).toFixed(1) + '%');
+          pars.forEach(function (p) {
+            var k = p.getAttribute('data-par').split(',');
+            p.style.transform = 'translate3d(' + ((x * 2 - 1) * k[0]).toFixed(1) + 'px,' + ((y * 2 - 1) * k[1]).toFixed(1) + 'px,0)';
+          });
+        });
+      });
+      hero.addEventListener('pointerleave', function () {
+        hero.classList.remove('hovering');
+        pars.forEach(function (p) { p.style.transform = ''; });
+      });
+    }
+
+    // reveal on scroll + count-up
+    var reveals = document.querySelectorAll('.reveal');
+    var counters = document.querySelectorAll('[data-count]');
+    function countUp(el) {
+      var target = Number(el.getAttribute('data-count')), start = null;
+      if (reduce) { el.textContent = target.toLocaleString('en-US'); return; }
+      function step(t) {
+        if (!start) start = t;
+        var p = Math.min(1, (t - start) / 1800), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * e).toLocaleString('en-US');
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          if (en.target.hasAttribute('data-count')) countUp(en.target); else en.target.classList.add('in');
+          io.unobserve(en.target);
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+      reveals.forEach(function (el) { io.observe(el); });
+      counters.forEach(function (el) { io.observe(el); });
+    } else {
+      reveals.forEach(function (el) { el.classList.add('in'); });
+      counters.forEach(countUp);
+    }
+
+    // back to top visibility
+    var totop = document.getElementById('totop'), ticking = false;
+    function onScroll() {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function () { totop.classList.toggle('hide', scrollY < 500); ticking = false; });
+    }
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+    // grade chips + table links
+    var form = document.getElementById('qform');
+    var chips = form.querySelectorAll('[data-chip]');
+    function pick(name) {
+      var match = null;
+      chips.forEach(function (ch) { if (ch.getAttribute('data-chip') === name) match = ch; });
+      if (!match) chips.forEach(function (ch) { if (/other/i.test(ch.getAttribute('data-chip'))) match = ch; });
+      chips.forEach(function (ch) { ch.setAttribute('aria-pressed', ch === match ? 'true' : 'false'); });
+    }
+    chips.forEach(function (ch) { ch.addEventListener('click', function () { pick(ch.getAttribute('data-chip')); }); });
+    document.querySelectorAll('[data-grade]').forEach(function (a) {
+      a.addEventListener('click', function () { pick(a.getAttribute('data-grade')); toast('Grade ' + a.getAttribute('data-grade') + ' selected'); });
+    });
+
+    // send via WhatsApp / email
+    var via = 'wa';
+    form.querySelectorAll('[data-via]').forEach(function (b) { b.addEventListener('click', function () { via = b.getAttribute('data-via'); }); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var d = new FormData(form), err = document.getElementById('qerr');
+      var phone = String(d.get('phone') || '').trim();
+      if (phone.replace(/\D/g, '').length < 9) { err.textContent = 'Please enter your phone number so we can call you back.'; form.phone.focus(); return; }
+      err.textContent = '';
+      var grade = (form.querySelector('[aria-pressed="true"]') || {}).textContent || '';
+      var lines = [
+        'Concrete quote request',
+        'Name: ' + (d.get('name') || '-'),
+        'Phone: ' + phone,
+        'Grade: ' + grade,
+        'Volume: ' + (d.get('volume') ? d.get('volume') + ' m³' : '-'),
+        'Pour date: ' + (d.get('date') || '-'),
+        'Site: ' + (d.get('site') || '-'),
+        'Pump needed: ' + (d.get('pump') ? 'Yes' : 'No')
+      ].join('\n');
+      if (via === 'mail' && c.contact.email) {
+        location.href = 'mailto:' + c.contact.email + '?subject=' + encodeURIComponent('Concrete quote request — ' + grade) + '&body=' + encodeURIComponent(lines);
+      } else {
+        var n = String(c.contact.whatsapp || '').replace(/\D/g, '');
+        window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(lines), '_blank', 'noopener');
+      }
+      toast('Opening ' + (via === 'mail' ? 'your email app' : 'WhatsApp') + '…');
+    });
+  }
+
+  var toastTimer;
+  function toast(msg) {
+    var t = document.getElementById('toast'); if (!t) return;
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+
+  function done() { var l = document.getElementById('loader'); if (l) l.classList.add('done'); }
+  function fail() {
+    app.innerHTML = '<div style="padding:80px 24px;text-align:center"><h1 style="font-family:Oswald,sans-serif">CoBuilt Solutions</h1><p style="color:#A1A1AA;margin-top:12px">The page could not load. Please refresh, or call +251 911 246 502.</p></div>';
+    done();
+  }
+
+  /* ---------- boot ---------- */
+  if (isPreview && window.opener) {
+    window.addEventListener('message', function (e) {
+      if (e.origin !== location.origin || !e.data || e.data.type !== 'cobuilt-preview') return;
+      try { render(e.data.content); } catch (x) { console.error(x); fail(); }
+      done();
+    });
+    window.opener.postMessage({ type: 'cobuilt-preview-ready' }, location.origin);
+  } else {
+    fetch('content.json?v=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (c) { render(c); done(); })
+      .catch(function (x) { console.error(x); fail(); });
+  }
+})();
