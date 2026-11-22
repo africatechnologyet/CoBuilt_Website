@@ -137,12 +137,16 @@
     if (isPreview && window.parent === window) html += '<div class="preview-bar">Preview — not published yet. Close this tab to keep editing.</div>';
 
     /* header */
+    var soc = socialLinks(c), ph0 = arr(ct.phones)[0];
+    if (soc.length) html += '<div class="topbar"><div class="wrap tb"><div class="tbinfo">' +
+      (ph0 ? '<a href="tel:' + digits(ph0) + '">' + SVG.phone + esc(ph0) + '</a>' : '') + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') +
+      '</div>' + socialHtml(soc, 'in-top') + '</div></div>';
     html += '<header class="top"><div class="wrap hdr">' +
       '<a class="brand" href="#top"><img src="' + url(b.mark) + '" alt="' + esc(b.name) + ' Solutions"><span>' + esc(b.name) + '</span></a>' +
       '<nav class="nav" aria-label="Main">' + nav.map(function (n) { return '<a class="link" href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') +
       '<a class="btn btn-primary" href="#quote">Get a quote</a>' +
       '<button type="button" class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav">' + SVG.menu + '</button></nav></div>' +
-      '<nav class="mnav" id="mnav" aria-label="Mobile">' + nav.map(function (n) { return '<a href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') + '<a href="#quote">Get a quote →</a></nav></header>';
+      '<nav class="mnav" id="mnav" aria-label="Mobile">' + nav.map(function (n) { return '<a href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') + '<a class="mcta" href="#quote">Get a quote →</a>' + (soc.length ? '<div class="msocial"><span>' + esc((c.social || {}).title || 'Follow us') + '</span>' + socialHtml(soc) + '</div>' : '') + '</nav></header>';
 
     /* hero */
     var heroLogos = h.showLogos === false ? [] : clients.slice(0, h.logoCount || 6);
@@ -261,7 +265,7 @@
       '<div class="txt reveal"><span class="eyebrow">' + esc(ct.eyebrow) + '</span><h2 class="h2 big" style="color:var(--accent)">' + esc(ct.title) + '</h2>' +
       (ct.text ? '<p class="sub">' + esc(ct.text) + '</p>' : '') +
       '<div class="phones">' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') + '</div>' +
-      '<div class="cinfo">' + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div>' + socialHtml(socialLinks(c), 'in-contact') + '</div>' +
+      '<div class="cinfo">' + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div>' +
       '<form class="quote-form reveal" id="qform" novalidate>' +
       '<div class="f2"><label class="f">Full name<input name="name" type="text" autocomplete="name" placeholder="Your name"></label>' +
       '<label class="f">Phone<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+251 …" required></label></div>' +
@@ -290,9 +294,8 @@
     }
 
     /* footer */
-    var soc = socialLinks(c);
     html += '<footer class="foot"><div class="wrap"><div class="fgrid"><div><img src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" style="width:96px;height:auto">' +
-      '<p class="ftag">' + esc(f.tagline) + ' <b>' + esc(f.taglineBold) + '</b></p>' + (soc.length ? '<p class="sfollow">' + esc((c.social || {}).title || 'Follow us') + '</p>' + socialHtml(soc) : '') + '</div>' +
+      '<p class="ftag">' + esc(f.tagline) + ' <b>' + esc(f.taglineBold) + '</b></p></div>' +
       '<div class="fcols"><div><h4>Company</h4>' + nav.map(function (n) { return '<a href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') + '</div>' +
       '<div><h4>Contact</h4>' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') +
       (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div></div>' +

@@ -55,8 +55,8 @@
       { k: 'places', t: 'list', add: 'Add location', title: 'Location', fields: [T('name', 'Name', 'e.g. Batching plant'), T('address', 'Address shown on the site'),
         T('map', 'Map pin', 'Most exact: in Google Maps press and hold on the spot, copy the numbers that appear (e.g. 9.0105, 38.7613) and paste them here. A Google Maps share link or a place name also works.'),
         T('note', 'Extra line (optional)', 'e.g. Open Mon–Sat, 7:00–18:00')] }]) },
-    { key: 'social', label: 'Social media', desc: 'Your social media pages. Turn each one on or off. An icon shows in the footer and the contact area only when it is on and has a link (starting with https://).', fields: [
-      T('title', 'Heading above the icons', 'e.g. Follow us'),
+    { key: 'social', label: 'Social media', desc: 'Your social media pages. Turn each one on or off. An icon shows in the top header (inside the menu on phones) only when it is on and has a link (starting with https://).', fields: [
+      T('title', 'Heading above the icons in the phone menu', 'e.g. Follow us'),
       { k: 'facebookOn', t: 'bool', l: 'Show Facebook', def: false }, T('facebook', 'Facebook link', 'e.g. https://facebook.com/yourpage'),
       { k: 'instagramOn', t: 'bool', l: 'Show Instagram', def: false }, T('instagram', 'Instagram link', 'e.g. https://instagram.com/yourname'),
       { k: 'linkedinOn', t: 'bool', l: 'Show LinkedIn', def: false }, T('linkedin', 'LinkedIn link', 'e.g. https://linkedin.com/company/yourcompany'),
