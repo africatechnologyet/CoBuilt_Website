@@ -380,6 +380,27 @@
       "Other"
     ]
   },
+  "location": {
+    "show": true,
+    "eyebrow": "Find us",
+    "title": "Our",
+    "highlight": "locations",
+    "text": "Visit our batching plant or head office. Tap Get directions to open the route in Google Maps.",
+    "places": [
+      {
+        "name": "Batching plant",
+        "address": "Goro / Balo, Addis Ababa",
+        "map": "Goro, Addis Ababa, Ethiopia",
+        "note": ""
+      },
+      {
+        "name": "Head office",
+        "address": "Bole, Woreda 12, Addis Ababa",
+        "map": "Bole, Addis Ababa, Ethiopia",
+        "note": ""
+      }
+    ]
+  },
   "footer": {
     "tagline": "Engineered for strength,",
     "taglineBold": "built for tomorrow.",

@@ -18,6 +18,19 @@
   function arr(v) { return Array.isArray(v) ? v : []; }
   function digits(v) { return String(v || '').replace(/[^\d+]/g, ''); }
   function shown(sec) { return sec && sec.show !== false; }
+  /* map: accepts a place name / address, "9.01, 38.76" coordinates, or a pasted Google Maps link */
+  function mapTarget(p) {
+    var m = String(p.map || '').trim(), addr = String(p.address || p.name || '').trim(), ll;
+    if ((ll = m.match(/^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/))) return { q: ll[1] + ',' + ll[2], link: '' };
+    if (/^https?:\/\//i.test(m)) {
+      ll = m.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || m.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || m.match(/[?&](?:q|query|ll|destination)=(-?\d+\.\d+)(?:,|%2C)(-?\d+\.\d+)/i);
+      return { q: ll ? ll[1] + ',' + ll[2] : addr, link: m };
+    }
+    return { q: m || addr, link: '' };
+  }
+  var SVG_PIN = 'M12 22s-7-6-7-12a7 7 0 0 1 14 0c0 6-7 12-7 12zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z';
+  function mapEmbed(p) { var t = mapTarget(p); return t.q ? 'https://maps.google.com/maps?q=' + encodeURIComponent(t.q) + '&z=' + (/^-?\d/.test(t.q) ? 16 : 14) + '&output=embed' : ''; }
+  function mapLink(p) { var t = mapTarget(p); return t.link || (t.q ? 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(t.q) : ''); }
   function head(s, side) {
     return '<div class="head reveal"><div>' +
       (s.eyebrow ? '<span class="eyebrow">' + esc(s.eyebrow) + '</span>' : '') +
@@ -60,7 +73,7 @@
   var HIDE = {
     heroLogos: '.hero .tiles', stats: '#stats', clients: '.clients', services: '#services', plant: '#plant-block', lab: '#lab-block',
     video: '#video', heroVideo: '.hero-video',
-    grades: '#grades', fleet: '.fleet', testimonials: '#projects', steps: '#process', callBar: '.mbar', backToTop: '.totop'
+    grades: '#grades', fleet: '.fleet', testimonials: '#projects', steps: '#process', callBar: '.mbar', backToTop: '.totop', location: '#location'
   };
   var MEDIA = { phone: '(max-width:640px)', tablet: '(min-width:641px) and (max-width:1024px)', computer: '(min-width:1025px)' };
   function px(v, lo, hi) { v = Number(v); return isFinite(v) && v > 0 ? Math.min(hi, Math.max(lo, v)) + 'px' : ''; }
@@ -97,6 +110,7 @@
     if (shown(c.plant) || shown(c.lab)) nav.push(['#plant', 'Plant & Lab']);
     if (shown(c.grades)) nav.push(['#grades', 'Mix grades']);
     if (shown(c.testimonials)) nav.push(['#projects', 'Projects']);
+    if (shown(c.location) && arr((c.location || {}).places).length) nav.push(['#location', 'Location']);
 
     var html = '';
     if (isPreview && window.parent === window) html += '<div class="preview-bar">Preview — not published yet. Close this tab to keep editing.</div>';
@@ -241,6 +255,18 @@
       '<div class="send">' + (ct.whatsapp ? '<button type="submit" class="btn btn-primary btn-lg" data-via="wa">' + SVG.wa + 'Send on WhatsApp</button>' : '') +
       (ct.email ? '<button type="submit" class="btn btn-ghost btn-lg" data-via="mail" style="text-transform:none">Send by email</button>' : '') + '</div>' +
       '<p class="note">Your request opens in WhatsApp or your email app, ready to send.</p></form></div></section>';
+
+    /* location */
+    var lc = c.location;
+    if (shown(lc) && arr(lc.places).length) {
+      html += '<section class="sec" id="location"><div class="wrap">' + head(lc, true) + '<div class="locs">' + arr(lc.places).map(function (p) {
+        var src = mapEmbed(p), go = mapLink(p);
+        return '<article class="loc reveal"><div class="map">' + (src ? '<iframe src="' + url(src) + '" title="Map: ' + esc(p.name) + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>' : '') + '</div>' +
+          '<div class="lbody"><span class="lpin"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + SVG_PIN + '"></path></svg></span>' +
+          '<div><h3>' + esc(p.name) + '</h3>' + (p.address ? '<p>' + esc(p.address) + '</p>' : '') + (p.note ? '<p class="lnote">' + esc(p.note) + '</p>' : '') + '</div>' +
+          (go ? '<a class="btn btn-ghost" href="' + url(go) + '" target="_blank" rel="noopener">Get directions' + SVG.arrow + '</a>' : '') + '</div></article>';
+      }).join('') + '</div></div></section>';
+    }
 
     /* footer */
     html += '<footer class="foot"><div class="wrap"><div class="fgrid"><div><img src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" style="width:96px;height:auto">' +
