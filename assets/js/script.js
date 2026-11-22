@@ -355,8 +355,33 @@
       });
     }
 
+    // stagger: number each animated item within its row so they appear one after another
+    document.querySelectorAll('.reveal, .stat').forEach(function (el) {
+      var sib = Array.prototype.filter.call(el.parentNode.children, function (x) { return x.classList.contains('reveal') || x.classList.contains('stat'); });
+      if (sib.length > 1) el.style.setProperty('--i', Math.min(sib.indexOf(el), 6));
+    });
+    document.querySelectorAll('.table-box tr.row').forEach(function (tr, i) { tr.style.setProperty('--r', Math.min(i, 10)); });
+
+    // glow that follows the mouse on cards + slightly magnetic orange buttons (mouse only)
+    if (!reduce && matchMedia('(hover:hover)').matches) {
+      document.querySelectorAll('.card, .loc').forEach(function (cd) {
+        cd.addEventListener('pointermove', function (e) {
+          var r = cd.getBoundingClientRect();
+          cd.style.setProperty('--mx', (e.clientX - r.left) + 'px'); cd.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        });
+      });
+      document.querySelectorAll('.btn-primary').forEach(function (bt) {
+        bt.addEventListener('pointermove', function (e) {
+          if (e.pointerType !== 'mouse') return;
+          var r = bt.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+          bt.style.translate = (x * 8).toFixed(1) + 'px ' + (y * 6).toFixed(1) + 'px';
+        });
+        bt.addEventListener('pointerleave', function () { bt.style.translate = ''; });
+      });
+    }
+
     // reveal on scroll + count-up
-    var reveals = document.querySelectorAll('.reveal');
+    var reveals = document.querySelectorAll('.reveal, .stat');
     var counters = document.querySelectorAll('[data-count]');
     function countUp(el) {
       var target = Number(el.getAttribute('data-count')), start = null;
@@ -377,7 +402,18 @@
           io.unobserve(en.target);
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-      if (instant) reveals.forEach(function (el) { el.classList.add('in'); }); else reveals.forEach(function (el) { io.observe(el); });
+      // photos start fully covered (curtain), so watch their row instead of the photo itself
+      var zio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          en.target.querySelectorAll(':scope > .zoom.reveal').forEach(function (z) { z.classList.add('in'); });
+          zio.unobserve(en.target);
+        });
+      }, { threshold: 0.12 });
+      if (instant) reveals.forEach(function (el) { el.classList.add('in'); });
+      else reveals.forEach(function (el) {
+        if (el.classList.contains('zoom') && el.parentNode !== document.body) zio.observe(el.parentNode); else io.observe(el);
+      });
       counters.forEach(function (el) { io.observe(el); });
     } else {
       reveals.forEach(function (el) { el.classList.add('in'); });
