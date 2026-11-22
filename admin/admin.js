@@ -14,6 +14,8 @@
   var SECTIONS = [
     { key: 'hero', label: 'Top of page', desc: 'The big "READY MIX CONCRETE" area visitors see first.', fields: [
       T('line1', 'Big title — line 1'), T('line2', 'Big title — line 2'), TA('text', 'Intro text'), T('buttonText', 'Main button text'),
+      { k: 'backgroundVideo', t: 'video', l: 'Background video (optional)', h: 'A short silent clip (10–30 seconds, MP4, under 20 MB) plays in a loop behind the title. Leave empty to use the concrete picture.' },
+      { k: 'videoOnPhones', t: 'bool', l: 'Also play the background video on phones (uses more mobile data)', def: false },
       { k: 'showLogos', t: 'bool', l: 'Show client logos under the buttons' }, { k: 'logoCount', t: 'number', l: 'How many client logos to show there', h: 'The first logos from "Client logos" are used.' }] },
     { key: 'stats', label: 'Key figures', desc: 'The numbers that count up under the top section.',
       note: 'To change how big the numbers are on computer, tablet or phone, open "Phone, tablet & computer".',
@@ -25,6 +27,11 @@
       { k: 'items', t: 'list', add: 'Add logo', title: 'Logo', fields: [T('name', 'Company name'), IMG('image', 'Logo', 'logo')] }] },
     { key: 'services', label: 'Services', desc: 'The "We are what you need" cards.', fields: [SHOW].concat(HEAD, [TA('text', 'Text beside the title'),
       { k: 'items', t: 'list', add: 'Add service', title: 'Service', fields: [{ k: 'icon', t: 'select', l: 'Icon', options: ICON_OPTIONS }, T('title', 'Title'), TA('text', 'Description')] }]) },
+    { key: 'video', label: 'Video', desc: 'A video on the page: paste a YouTube link (best for long videos) or upload a short MP4 file.', fields: [SHOW].concat(HEAD, [TA('text', 'Text'),
+      { k: 'source', t: 'select', l: 'Video comes from', options: [['youtube', 'YouTube link'], ['file', 'Uploaded video file']] },
+      T('youtube', 'YouTube link', 'Copy the link from YouTube (Share → Copy), e.g. https://youtu.be/abc123'),
+      { k: 'file', t: 'video', l: 'Video file', h: 'MP4, up to about 40 MB. For longer videos, use YouTube.' },
+      IMG('poster', 'Cover picture', 'photo', 'Shown before the video plays. For YouTube, leave the default to use YouTube\'s own cover.')]) },
     { key: 'plant', label: 'Batching plant', desc: 'Plant photo, the floating badge and the feature checklist.', fields: [SHOW].concat(HEAD, [TA('text', 'Text'), IMG('image', 'Plant photo'),
       T('badgeValue', 'Badge — big text', 'e.g. 1,500 m³ / day. Leave empty to hide the badge.'), T('badgeLabel', 'Badge — small text'),
       { k: 'features', t: 'strings', l: 'Feature checklist', add: 'Add feature' }]) },
@@ -145,12 +152,13 @@
     var btn = $('publishBtn');
     if (!S.dirty) { toast('Nothing new to publish.'); return; }
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Publishing…';
-    var head, baseTree, files = [];
-    Object.keys(S.pending).forEach(function (p) {
-      if (JSON.stringify(S.content).indexOf('"' + p + '"') >= 0) files.push({ path: p, b64: S.pending[p].b64 });
-    });
-    files.push({ path: 'content.json', b64: b64encodeUtf8(JSON.stringify(S.content, null, 2) + '\n') });
-    gh('/git/ref/heads/' + encodeURIComponent(S.branch)).then(function (ref) {
+    var head, baseTree, files = [], json = JSON.stringify(S.content), used = Object.keys(S.pending).filter(function (p) { return json.indexOf('"' + p + '"') >= 0; });
+    var hasVideo = used.some(function (p) { return S.pending[p].video; });
+    if (hasVideo) btn.innerHTML = '<span class="spin"></span> Uploading video…';
+    Promise.all(used.map(function (p) { return readB64(S.pending[p]).then(function (b) { files.push({ path: p, b64: b }); }); })).then(function () {
+      files.push({ path: 'content.json', b64: b64encodeUtf8(JSON.stringify(S.content, null, 2) + '\n') });
+      return gh('/git/ref/heads/' + encodeURIComponent(S.branch));
+    }).then(function (ref) {
       head = ref.object.sha;
       return gh('/git/commits/' + head);
     }).then(function (commit) {
@@ -164,7 +172,7 @@
       return gh('/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: tree } });
     }).then(function (tree) {
       var n = files.length - 1;
-      return gh('/git/commits', { method: 'POST', body: { message: 'Update website from admin' + (n ? ' (' + n + ' new picture' + (n > 1 ? 's' : '') + ')' : ''), tree: tree.sha, parents: [head] } });
+      return gh('/git/commits', { method: 'POST', body: { message: 'Update website from admin' + (n ? ' (' + n + ' new file' + (n > 1 ? 's' : '') + ')' : ''), tree: tree.sha, parents: [head] } });
     }).then(function (commit) {
       return gh('/git/refs/heads/' + encodeURIComponent(S.branch), { method: 'PATCH', body: { sha: commit.sha } });
     }).then(function () {
@@ -178,7 +186,8 @@
 
   /* ================= drafts ================= */
   function saveDraft() {
-    try { localStorage.setItem(LS.draft, JSON.stringify({ repo: S.repo, base: S.published, content: S.content, pending: S.pending })); }
+    var keep = {}; Object.keys(S.pending).forEach(function (k) { if (S.pending[k].b64) keep[k] = S.pending[k]; });
+    try { localStorage.setItem(LS.draft, JSON.stringify({ repo: S.repo, base: S.published, content: S.content, pending: keep })); }
     catch (e) {
       try { localStorage.setItem(LS.draft, JSON.stringify({ repo: S.repo, base: S.published, content: S.content, pending: {} })); } catch (x) { /* ignore */ }
     }
@@ -192,15 +201,15 @@
       { label: 'Keep my changes', cls: 'primary', fn: function () {
         S.content = d.content; S.pending = d.pending || {};
         var missing = 0;
-        walkImages(S.content, function (obj, key) { var p = obj[key]; if (/^assets\/img\/uploads\//.test(p) && !S.pending[p] && d.base.indexOf('"' + p + '"') < 0) missing++; });
-        if (missing) toast(missing + ' new picture(s) could not be kept in the draft. Please choose them again before publishing.', 'bad');
+        walkImages(S.content, function (obj, key) { var p = obj[key]; if (/^assets\/(img|video)\/uploads\//.test(p) && !S.pending[p] && d.base.indexOf('"' + p + '"') < 0) missing++; });
+        if (missing) toast(missing + ' new picture(s) or video(s) could not be kept in the draft. Please choose them again before publishing.', 'bad');
         setDirty(true); renderNav(); renderSection();
         if (d.base !== S.published) toast('Note: the website was changed somewhere else since this draft.', 'bad');
       } }]);
   }
   function walkImages(o, fn) {
     if (!o || typeof o !== 'object') return;
-    Object.keys(o).forEach(function (k) { if (typeof o[k] === 'string' && /^assets\/img\//.test(o[k])) fn(o, k); else walkImages(o[k], fn); });
+    Object.keys(o).forEach(function (k) { if (typeof o[k] === 'string' && /^assets\/(img|video)\//.test(o[k])) fn(o, k); else walkImages(o[k], fn); });
   }
 
   function setDirty(v) {
@@ -243,7 +252,17 @@
     });
   }
   function slug(s) { return String(s || 'image').toLowerCase().replace(/\.[a-z0-9]+$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'image'; }
-  function imgSrc(p) { return S.pending[p] ? S.pending[p].dataUrl : (p ? '/' + p : ''); }
+  function imgSrc(p) { return S.pending[p] ? (S.pending[p].dataUrl || S.pending[p].url) : (p ? '/' + p : ''); }
+  var mediaSrc = imgSrc;
+  function readB64(entry) {
+    if (entry.b64) return Promise.resolve(entry.b64);
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onload = function () { res(String(r.result).split(',')[1]); };
+      r.onerror = function () { rej(new Error('Could not read the video file. Choose it again.')); };
+      r.readAsDataURL(entry.file);
+    });
+  }
 
   /* ================= form rendering ================= */
   function renderNav() {
@@ -285,7 +304,7 @@
     }
     if (f.t === 'bool') {
       var c2 = el('input', { type: 'checkbox', id: id });
-      c2.checked = obj[f.k] !== false;
+      c2.checked = obj[f.k] == null ? f.def !== false : obj[f.k] !== false;
       c2.addEventListener('change', function () { obj[f.k] = c2.checked; changed(); });
       return el('label', { class: 'toggle', for: id }, [c2, el('span', { text: f.l })]);
     }
@@ -321,6 +340,8 @@
       col.addEventListener('input', function () { hex.value = col.value; obj[f.k] = col.value; changed(); });
       hex.addEventListener('change', function () { if (/^#[0-9a-f]{6}$/i.test(hex.value)) { col.value = hex.value; obj[f.k] = hex.value; changed(); } else hex.value = col.value; });
       wrap.append(lab, el('div', { class: 'color' }, [col, hex]));
+    } else if (f.t === 'video') {
+      wrap.append(lab, videoField(obj, f, id));
     } else if (f.t === 'image') {
       wrap.append(lab, imageField(obj, f, id));
     } else if (f.t === 'list') {
@@ -364,6 +385,46 @@
     return box;
   }
 
+  var VMAX = 45 * 1024 * 1024;
+  function videoField(obj, f, id) {
+    var box = el('div', { class: 'img' });
+    var holder = el('div', { class: 'thumb', style: 'background:#000;display:flex;align-items:center;justify-content:center;color:#777;font-size:13px' });
+    var input = el('input', { id: id, type: 'file', accept: 'video/mp4,video/webm,video/quicktime', style: 'display:none' });
+    var path = el('div', { class: 'path' });
+    var rm = el('button', { class: 'btn danger', type: 'button', text: 'Remove video', onclick: function () { obj[f.k] = ''; show(); changed(); } });
+    function show() {
+      var p = obj[f.k]; holder.innerHTML = '';
+      if (p) {
+        var v = el('video', { src: mediaSrc(p), muted: true, playsinline: true, preload: 'metadata', style: 'width:100%;height:100%;object-fit:cover' });
+        v.muted = true; v.addEventListener('mouseenter', function () { v.play().catch(function () {}); }); v.addEventListener('mouseleave', function () { v.pause(); });
+        holder.appendChild(v);
+        if (S.pending[p]) holder.appendChild(el('span', { class: 'new', text: 'NEW' }));
+      } else holder.textContent = 'No video';
+      path.textContent = p ? (S.pending[p] ? 'New video — uploads when you publish (' + (S.pending[p].size / 1048576).toFixed(1) + ' MB)' : p) : 'No video yet';
+      rm.style.display = p ? '' : 'none';
+    }
+    function take(file) {
+      if (!file) return;
+      if (!/^video\//.test(file.type)) { toast('Please choose a video file (MP4).', 'bad'); return; }
+      if (file.size > VMAX) { toast('This video is ' + (file.size / 1048576).toFixed(0) + ' MB. The limit is 45 MB — shorten it, or upload it to YouTube and paste the link.', 'bad'); return; }
+      var ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
+      if (ext === 'mov') ext = 'mp4';
+      var p = 'assets/video/uploads/' + Date.now().toString(36) + '-' + slug(file.name) + '.' + ext;
+      S.pending[p] = { file: file, url: URL.createObjectURL(file), size: file.size, video: true };
+      obj[f.k] = p; show(); changed();
+      if (file.size > 20 * 1048576) toast('Video added. Large videos make the page slower on mobile data — under 20 MB is best.', 'ok');
+      else toast('Video ready. Press Publish to put it on the website.', 'ok');
+    }
+    input.addEventListener('change', function () { take(input.files[0]); input.value = ''; });
+    box.addEventListener('dragover', function (e) { e.preventDefault(); box.classList.add('drop'); });
+    box.addEventListener('dragleave', function () { box.classList.remove('drop'); });
+    box.addEventListener('drop', function (e) { e.preventDefault(); box.classList.remove('drop'); take(e.dataTransfer.files[0]); });
+    show();
+    box.append(holder, el('div', { class: 'act' }, [
+      el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, [el('button', { class: 'btn', type: 'button', text: 'Choose video', onclick: function () { input.click(); } }), rm]),
+      path, el('p', { class: 'hint', style: 'margin:0', text: 'Or drag a video here.' }), input]));
+    return box;
+  }
   function listField(parent, key, def) {
     var arr = parent[key], box = el('div');
     var list = el('div', { class: 'list' });
@@ -421,7 +482,7 @@
     phone: { numberSize: 34, titleSize: 64, headingSize: 34, hide: [] }
   };
   var HIDE_OPTS = [
-    ['heroLogos', 'Client logos under the top buttons'], ['stats', 'Key figures'], ['clients', 'Scrolling client logos'], ['services', 'Services'],
+    ['heroLogos', 'Client logos under the top buttons'], ['stats', 'Key figures'], ['clients', 'Scrolling client logos'], ['services', 'Services'], ['video', 'Video section'], ['heroVideo', 'Top background video'],
     ['plant', 'Batching plant'], ['lab', 'Laboratory'], ['grades', 'Mix grades & prices'], ['fleet', 'Truck banner'],
     ['testimonials', 'Testimonials'], ['steps', 'How it works'], ['backToTop', 'Back-to-top button']
   ];
@@ -484,7 +545,7 @@
   var pv = { open: false, frame: null, ready: false, device: 'computer' };
   function previewContent() {
     var c = clone(S.content);
-    walkImages(c, function (o, k) { if (S.pending[o[k]]) o[k] = S.pending[o[k]].dataUrl; });
+    walkImages(c, function (o, k) { var e = S.pending[o[k]]; if (e) o[k] = e.dataUrl || e.url; });
     return c;
   }
   function sendPreview(keep) {

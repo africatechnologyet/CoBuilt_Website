@@ -17,7 +17,9 @@
     "text": "Concrete built to last. High-quality ready-mix from our fully automated two batching plants in Goro/Balo, Addis Ababa, for Ethiopia's growing infrastructure and building needs.",
     "buttonText": "Request a quote",
     "showLogos": true,
-    "logoCount": 12
+    "logoCount": 12,
+    "backgroundVideo": "",
+    "videoOnPhones": false
   },
   "stats": [
     {
@@ -178,6 +180,17 @@
         "text": "Mix design recommendations and construction support from our engineers and lab team."
       }
     ]
+  },
+  "video": {
+    "show": false,
+    "eyebrow": "See us at work",
+    "title": "Our plant",
+    "highlight": "in action",
+    "text": "Watch how we batch, test and deliver ready-mix concrete across Addis Ababa.",
+    "source": "youtube",
+    "youtube": "",
+    "file": "",
+    "poster": "assets/img/plant.jpg"
   },
   "plant": {
     "show": true,

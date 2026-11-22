@@ -50,9 +50,16 @@
     wa: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3z"></path></svg>'
   };
 
+  function ytId(u) {
+    var m = String(u || '').match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(String(u || '').trim()) ? String(u).trim() : '');
+  }
+  SVG.play = '<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path></svg>';
+
   /* ---------- per-device settings (phone / tablet / computer) ---------- */
   var HIDE = {
     heroLogos: '.hero .tiles', stats: '#stats', clients: '.clients', services: '#services', plant: '#plant-block', lab: '#lab-block',
+    video: '#video', heroVideo: '.hero-video',
     grades: '#grades', fleet: '.fleet', testimonials: '#projects', steps: '#process', callBar: '.mbar', backToTop: '.totop'
   };
   var MEDIA = { phone: '(max-width:640px)', tablet: '(min-width:641px) and (max-width:1024px)', computer: '(min-width:1025px)' };
@@ -103,7 +110,9 @@
 
     /* hero */
     var heroLogos = h.showLogos === false ? [] : clients.slice(0, h.logoCount || 6);
-    html += '<section class="hero" id="top"><div class="vignette"></div><div class="spot"></div><div class="hero-in">' +
+    var isPhone = window.matchMedia && matchMedia('(max-width:640px)').matches;
+    var bgv = h.backgroundVideo && (!isPhone || h.videoOnPhones) ? '<video class="hero-video" src="' + url(h.backgroundVideo) + '" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>' : '';
+    html += '<section class="hero' + (bgv ? ' has-video' : '') + '" id="top">' + bgv + '<div class="vignette"></div><div class="spot"></div><div class="hero-in">' +
       '<div class="par" data-par="-14,-10"><img class="hero-logo" src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" width="686" height="720"></div>' +
       '<h1 class="par" data-par="8,6"><span class="concrete l1">' + esc(h.line1) + '</span><span class="concrete l2">' + esc(h.line2) + '</span></h1>' +
       '<span class="rule" aria-hidden="true"></span>' +
@@ -138,6 +147,21 @@
       html += '<section class="sec" id="services"><div class="wrap">' + head(sv, true) + '<div class="grid">' + arr(sv.items).map(function (it) {
         return '<article class="card reveal"><div class="ic">' + icon(it.icon) + '</div><h3>' + esc(it.title) + '</h3><p>' + esc(it.text) + '</p></article>';
       }).join('') + '</div></div></section>';
+    }
+
+    /* video */
+    var vd = c.video;
+    if (shown(vd)) {
+      var yid = vd.source === 'youtube' ? ytId(vd.youtube) : '';
+      var hasFile = vd.source === 'file' && vd.file;
+      if (yid || hasFile) {
+        var poster = vd.poster || '';
+        if (yid && (!poster || /assets\/img\/plant\.jpg$/.test(poster))) poster = 'https://i.ytimg.com/vi/' + yid + '/hqdefault.jpg';
+        html += '<section class="sec" id="video"><div class="wrap">' + head(vd, true) +
+          '<div class="vbox reveal" data-yt="' + esc(yid) + '" data-file="' + (hasFile ? url(vd.file) : '') + '">' +
+          '<button type="button" class="vplay" aria-label="Play video: ' + esc((vd.title || '') + ' ' + (vd.highlight || '')) + '">' +
+          (poster ? '<img src="' + url(poster) + '" alt="" loading="lazy" data-fallback="' + url(vd.poster || 'assets/img/plant.jpg') + '">' : '') + '<span class="vbtn">' + SVG.play + '</span></button></div></div></section>';
+      }
     }
 
     /* plant + lab */
@@ -300,6 +324,25 @@
     } else {
       reveals.forEach(function (el) { el.classList.add('in'); });
       counters.forEach(countUp);
+    }
+
+    // video: load only when the visitor presses play (keeps the page fast)
+    document.querySelectorAll('.vplay img[data-fallback]').forEach(function (im) {
+      im.addEventListener('error', function () { var fb = im.getAttribute('data-fallback'); im.removeAttribute('data-fallback'); if (fb && im.getAttribute('src') !== fb) im.src = fb; else im.style.display = 'none'; });
+    });
+    document.querySelectorAll('.vbox').forEach(function (box) {
+      var btn = box.querySelector('.vplay'); if (!btn) return;
+      btn.addEventListener('click', function () {
+        var yid = box.getAttribute('data-yt'), file = box.getAttribute('data-file');
+        if (yid) box.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&playsinline=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+        else if (file) { box.innerHTML = '<video src="' + file + '" controls autoplay playsinline></video>'; }
+      });
+    });
+    var hv = document.querySelector('.hero-video');
+    if (hv) {
+      if (reduce) { hv.removeAttribute('autoplay'); hv.pause(); }
+      hv.addEventListener('canplay', function () { hv.classList.add('ready'); });
+      hv.addEventListener('error', function () { hv.remove(); });
     }
 
     // back to top visibility
