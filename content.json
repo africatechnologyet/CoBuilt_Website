@@ -6,10 +6,10 @@
   "brand": {
     "name": "CoBuilt",
     "accent": "#F06E22",
-    "logo": "assets/img/logo.png",
+    "logo": "assets/img/logo.webp",
     "mark": "assets/img/mark.png",
-    "background": "assets/img/bg.jpg",
-    "letterTexture": "assets/img/textfill.jpg"
+    "background": "assets/img/bg.webp",
+    "letterTexture": "assets/img/textfill.webp"
   },
   "hero": {
     "line1": "Ready Mix",
@@ -68,87 +68,87 @@
     "items": [
       {
         "name": "TTP",
-        "image": "assets/img/clients/ttp.png"
+        "image": "assets/img/clients/ttp.webp"
       },
       {
         "name": "CGCOC Group",
-        "image": "assets/img/clients/cgcoc.png"
+        "image": "assets/img/clients/cgcoc.webp"
       },
       {
         "name": "S.Hawi General Contractor",
-        "image": "assets/img/clients/shawi.png"
+        "image": "assets/img/clients/shawi.webp"
       },
       {
         "name": "AMG Holdings",
-        "image": "assets/img/clients/amg.png"
+        "image": "assets/img/clients/amg.webp"
       },
       {
         "name": "Addis Ababa City Construction Works Bureau",
-        "image": "assets/img/clients/aa-construction-bureau.png"
+        "image": "assets/img/clients/aa-construction-bureau.webp"
       },
       {
         "name": "Client",
-        "image": "assets/img/clients/coffee-client.png"
+        "image": "assets/img/clients/coffee-client.webp"
       },
       {
         "name": "Client",
-        "image": "assets/img/clients/a-client.png"
+        "image": "assets/img/clients/a-client.webp"
       },
       {
         "name": "HEX Trading PLC",
-        "image": "assets/img/clients/hex-trading.png"
+        "image": "assets/img/clients/hex-trading.webp"
       },
       {
         "name": "Haybu Business Group",
-        "image": "assets/img/clients/haybu.png"
+        "image": "assets/img/clients/haybu.webp"
       },
       {
         "name": "Mescon Constructions",
-        "image": "assets/img/clients/mescon.png"
+        "image": "assets/img/clients/mescon.webp"
       },
       {
         "name": "ProFix Construction Projects",
-        "image": "assets/img/clients/profix.png"
+        "image": "assets/img/clients/profix.webp"
       },
       {
         "name": "Primrose Coffee Exporters",
-        "image": "assets/img/clients/primrose.png"
+        "image": "assets/img/clients/primrose.webp"
       },
       {
         "name": "Mullege PLC",
-        "image": "assets/img/clients/mullege.png"
+        "image": "assets/img/clients/mullege.webp"
       },
       {
         "name": "Suba Engineering",
-        "image": "assets/img/clients/suba.png"
+        "image": "assets/img/clients/suba.webp"
       },
       {
         "name": "Beacon Construction Services",
-        "image": "assets/img/clients/beacon.png"
+        "image": "assets/img/clients/beacon.webp"
       },
       {
         "name": "Kibrom B.C",
-        "image": "assets/img/clients/kibrom.png"
+        "image": "assets/img/clients/kibrom.webp"
       },
       {
         "name": "Merit Properties",
-        "image": "assets/img/clients/merit.png"
+        "image": "assets/img/clients/merit.webp"
       },
       {
         "name": "Qolansa Construction",
-        "image": "assets/img/clients/qolansa.png"
+        "image": "assets/img/clients/qolansa.webp"
       },
       {
         "name": "Wallabu Construction",
-        "image": "assets/img/clients/wallabu.png"
+        "image": "assets/img/clients/wallabu.webp"
       },
       {
         "name": "Gutema Firisa Construction",
-        "image": "assets/img/clients/gutema-firisa.png"
+        "image": "assets/img/clients/gutema-firisa.webp"
       },
       {
         "name": "Safe Con General Construction",
-        "image": "assets/img/clients/safecon.png"
+        "image": "assets/img/clients/safecon.webp"
       }
     ]
   },
@@ -198,7 +198,7 @@
     "title": "Fully automated",
     "highlight": "batching plant",
     "text": "We partner with global industry leader XCMG Schwing to run a state-of-the-art plant. Accurate mixing and consistent quality let us serve large-scale projects with speed and reliability.",
-    "image": "assets/img/uploads/mwrz2hhb-2274f4d1-1f97-45ff-b7fc-cd8e0ee0bcf2.jpg",
+    "image": "assets/img/uploads/mwrz2hhb-2274f4d1-1f97-45ff-b7fc-cd8e0ee0bcf2.webp",
     "badgeValue": "1,500 m³ / day",
     "badgeLabel": "Daily production output",
     "features": [
@@ -216,7 +216,7 @@
     "title": "Every input",
     "highlight": "checked",
     "text": "Our in-house lab runs granulometric analysis of aggregates, slump and flow tests, compression testing and custom mix design optimization for each project.",
-    "image": "assets/img/uploads/mwrycaqq-aggregates.jpg",
+    "image": "assets/img/uploads/mwrycaqq-aggregates.webp",
     "materials": [
       {
         "name": "Crushed stone aggregates",
@@ -304,7 +304,7 @@
     "title": "GPS-tracked.",
     "highlight": "Always on time.",
     "text": "Modern drum systems keep concrete fresh during delivery, and our tracked fleet ensures timely dispatch across the city.",
-    "image": "assets/img/uploads/mwryscmk-61d5da52-f960-4370-a631-f408b578b616.jpg"
+    "image": "assets/img/uploads/mwryscmk-61d5da52-f960-4370-a631-f408b578b616.webp"
   },
   "testimonials": {
     "show": true,
