@@ -255,6 +255,12 @@
       '<div class="toast" id="toast" role="status"></div>';
 
     app.innerHTML = html;
+    app.querySelectorAll('img').forEach(function (im) {
+      im.addEventListener('error', function () {
+        var src = im.getAttribute('src') || '';
+        if (/\.(jpe?g|png)$/i.test(src) && !im.dataset.tried) { im.dataset.tried = '1'; im.src = src.replace(/\.(jpe?g|png)$/i, '.webp'); }
+      });
+    });
     wire(c);
   }
 

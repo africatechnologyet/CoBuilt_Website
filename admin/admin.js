@@ -141,6 +141,7 @@
 
   function loadContent() {
     return gh('/contents/content.json?ref=' + encodeURIComponent(S.branch)).then(function (f) {
+      S.sha = f.sha;
       S.content = JSON.parse(b64decodeUtf8(f.content));
       S.published = JSON.stringify(S.content);
       ensureDevices();
@@ -152,10 +153,13 @@
     var btn = $('publishBtn');
     if (!S.dirty) { toast('Nothing new to publish.'); return; }
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Publishing…';
+    var guard = gh('/contents/content.json?ref=' + encodeURIComponent(S.branch)).then(function (f) {
+      if (S.sha && f.sha !== S.sha) { var e = new Error('stale'); e.stale = true; throw e; }
+    });
     var head, baseTree, files = [], json = JSON.stringify(S.content), used = Object.keys(S.pending).filter(function (p) { return json.indexOf('"' + p + '"') >= 0; });
     var hasVideo = used.some(function (p) { return S.pending[p].video; });
     if (hasVideo) btn.innerHTML = '<span class="spin"></span> Uploading video…';
-    Promise.all(used.map(function (p) { return readB64(S.pending[p]).then(function (b) { files.push({ path: p, b64: b }); }); })).then(function () {
+    guard.then(function () { return Promise.all(used.map(function (p) { return readB64(S.pending[p]).then(function (b) { files.push({ path: p, b64: b }); }); })); }).then(function () {
       files.push({ path: 'content.json', b64: b64encodeUtf8(JSON.stringify(S.content, null, 2) + '\n') });
       return gh('/git/ref/heads/' + encodeURIComponent(S.branch));
     }).then(function (ref) {
@@ -176,11 +180,17 @@
     }).then(function (commit) {
       return gh('/git/refs/heads/' + encodeURIComponent(S.branch), { method: 'PATCH', body: { sha: commit.sha } });
     }).then(function () {
+      return gh('/contents/content.json?ref=' + encodeURIComponent(S.branch)).then(function (f) { S.sha = f.sha; }).catch(function () {});
+    }).then(function () {
       S.pending = {}; S.published = JSON.stringify(S.content); setDirty(false); clearDraft();
       dialog('Published!', 'Your changes are saved. The live website updates in about 1–2 minutes (Render rebuilds it automatically).', [
         { label: 'Close' }, { label: 'View website', cls: 'primary', fn: function () { window.open('/', '_blank', 'noopener'); } }]);
     }).catch(function (e) {
-      toast(friendly(e), 'bad');
+      if (e.stale) {
+        saveDraft();
+        dialog('The website was updated', 'Someone (or an update) changed the website after you opened this page. To avoid overwriting it, nothing was published. Reload to get the latest version — your unpublished changes are kept and you can re-apply them.', [
+          { label: 'Cancel' }, { label: 'Reload now', cls: 'primary', fn: function () { window.removeEventListener('beforeunload', onLeave); location.reload(); } }]);
+      } else toast(friendly(e), 'bad');
     }).then(function () { btn.disabled = false; btn.textContent = 'Publish'; renderSection(); });
   }
 
@@ -620,7 +630,8 @@
     if (e.key === 'Escape') { if ($('overlay').classList.contains('on')) $('overlay').classList.remove('on'); else if (pv.open) closePreview(); }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && $('app').classList.contains('on')) { e.preventDefault(); publish(); }
   });
-  window.addEventListener('beforeunload', function (e) { if (S.dirty) { saveDraft(); e.preventDefault(); e.returnValue = ''; } });
+  function onLeave(e) { if (S.dirty) { saveDraft(); e.preventDefault(); e.returnValue = ''; } }
+  window.addEventListener('beforeunload', onLeave);
 
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem(LS.auth) || sessionStorage.getItem(LS.auth) || 'null'); } catch (e) { saved = null; }
