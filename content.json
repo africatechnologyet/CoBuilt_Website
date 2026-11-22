@@ -1,0 +1,173 @@
+{
+  "meta": {
+    "title": "CoBuilt Solutions — Ready Mix Concrete, Addis Ababa",
+    "description": "CoBuilt Solutions supplies high-quality ready-mix concrete (C05 to C70) from a fully automated XCMG batching plant in Goro, Addis Ababa, with GPS-tracked mixer trucks and concrete pumps."
+  },
+  "brand": {
+    "name": "CoBuilt",
+    "accent": "#F06E22",
+    "logo": "assets/img/logo.png",
+    "mark": "assets/img/mark.png",
+    "background": "assets/img/bg.jpg",
+    "letterTexture": "assets/img/textfill.jpg"
+  },
+  "hero": {
+    "line1": "Ready Mix",
+    "line2": "Concrete",
+    "text": "Concrete built to last. High-quality ready-mix from our fully automated plant in Goro, Addis Ababa, for Ethiopia's growing infrastructure and building needs.",
+    "buttonText": "Request a quote",
+    "showLogos": true,
+    "logoCount": 6
+  },
+  "stats": [
+    { "value": 210, "suffix": " m³/h", "label": "Plant capacity" },
+    { "value": 15, "suffix": "", "label": "Mixer trucks in fleet" },
+    { "value": 102000, "suffix": " m³", "label": "Concrete delivered" },
+    { "value": 526, "suffix": "+", "label": "Projects supplied" }
+  ],
+  "clients": {
+    "title": "Our latest projects & partners",
+    "items": [
+      { "name": "TTP", "image": "assets/img/clients/ttp.png" },
+      { "name": "CGCOC Group", "image": "assets/img/clients/cgcoc.png" },
+      { "name": "S.Hawi General Contractor", "image": "assets/img/clients/shawi.png" },
+      { "name": "AMG Holdings", "image": "assets/img/clients/amg.png" },
+      { "name": "Addis Ababa City Construction Works Bureau", "image": "assets/img/clients/aa-construction-bureau.png" },
+      { "name": "Client", "image": "assets/img/clients/coffee-client.png" },
+      { "name": "Client", "image": "assets/img/clients/a-client.png" },
+      { "name": "HEX Trading PLC", "image": "assets/img/clients/hex-trading.png" },
+      { "name": "Haybu Business Group", "image": "assets/img/clients/haybu.png" },
+      { "name": "Mescon Constructions", "image": "assets/img/clients/mescon.png" },
+      { "name": "ProFix Construction Projects", "image": "assets/img/clients/profix.png" },
+      { "name": "Primrose Coffee Exporters", "image": "assets/img/clients/primrose.png" },
+      { "name": "Mullege PLC", "image": "assets/img/clients/mullege.png" },
+      { "name": "Suba Engineering", "image": "assets/img/clients/suba.png" },
+      { "name": "Beacon Construction Services", "image": "assets/img/clients/beacon.png" },
+      { "name": "Kibrom B.C", "image": "assets/img/clients/kibrom.png" },
+      { "name": "Merit Properties", "image": "assets/img/clients/merit.png" },
+      { "name": "Qolansa Construction", "image": "assets/img/clients/qolansa.png" },
+      { "name": "Wallabu Construction", "image": "assets/img/clients/wallabu.png" },
+      { "name": "Gutema Firisa Construction", "image": "assets/img/clients/gutema-firisa.png" },
+      { "name": "Safe Con General Construction", "image": "assets/img/clients/safecon.png" }
+    ]
+  },
+  "services": {
+    "show": true,
+    "eyebrow": "What we do",
+    "title": "We are",
+    "highlight": "what you need",
+    "text": "From the mix design to the last truck on site, one team handles your concrete end to end.",
+    "items": [
+      { "icon": "truck", "title": "Ready-mix concrete", "text": "Customizable mix designs from C05 to C70 and beyond, batched to your project specification." },
+      { "icon": "pump", "title": "Mixers & pumps", "text": "Supplied via modern transit mixers and concrete pumps for high-rise and hard-to-reach pours." },
+      { "icon": "pin", "title": "Delivery logistics", "text": "GPS-tracked fleet and planned dispatch so trucks arrive when your crew is ready." },
+      { "icon": "lab", "title": "Technical consultation", "text": "Mix design recommendations and construction support from our engineers and lab team." }
+    ]
+  },
+  "plant": {
+    "show": true,
+    "eyebrow": "Technology & equipment",
+    "title": "Fully automated",
+    "highlight": "batching plant",
+    "text": "We partner with global industry leader XCMG Schwing to run a state-of-the-art plant. Accurate mixing and consistent quality let us serve large-scale projects with speed and reliability.",
+    "image": "assets/img/plant.jpg",
+    "badgeValue": "1,500 m³ / day",
+    "badgeLabel": "Daily production output",
+    "features": [
+      "XCMG Schwing batching plant",
+      "High-speed conveyor systems",
+      "Moisture control systems",
+      "Real-time control room",
+      "GPS-tracked mixer fleet",
+      "1,500 m³ daily output"
+    ]
+  },
+  "lab": {
+    "show": true,
+    "eyebrow": "Advanced concrete laboratory",
+    "title": "Every input",
+    "highlight": "checked",
+    "text": "Our in-house lab runs granulometric analysis of aggregates, slump and flow tests, compression testing and custom mix design optimization for each project.",
+    "image": "assets/img/aggregates.jpg",
+    "materials": [
+      { "name": "Crushed stone aggregates", "note": "Clean, graded and durable" },
+      { "name": "Natural sand", "note": "Washed and moisture-controlled" },
+      { "name": "Ordinary Portland Cement", "note": "Lemi OPC, from certified suppliers" },
+      { "name": "Admixtures", "note": "For workability, setting and strength gain" },
+      { "name": "Clean water", "note": "Meets standards for mixing and curing" }
+    ]
+  },
+  "grades": {
+    "show": true,
+    "eyebrow": "Mix grades",
+    "title": "C05 to",
+    "highlight": "C70 and beyond",
+    "text": "Mixes designed to ES EN 206-1 / ASTM C94, using ES-marked Lemi OPC. Prices per m³, excluding pumping.",
+    "items": [
+      { "name": "C05 – C15", "strength": "5 – 15 MPa", "use": "Blinding, lean concrete, mass fill", "price": "On request" },
+      { "name": "C20", "strength": "20 MPa", "use": "Footpaths, light foundations", "price": "On request" },
+      { "name": "C25", "strength": "25 MPa", "use": "Residential slabs, footings, columns", "price": "On request" },
+      { "name": "C30", "strength": "30 MPa", "use": "Structural frames, beams, suspended slabs", "price": "On request" },
+      { "name": "C40", "strength": "40 MPa", "use": "High-rise structures, heavy-duty floors", "price": "On request" },
+      { "name": "C50", "strength": "50 MPa", "use": "High-strength columns and shear walls", "price": "On request" },
+      { "name": "C60 – C70+", "strength": "60 – 70+ MPa", "use": "Special high-performance applications", "price": "On request" }
+    ],
+    "testedByTitle": "Independently tested by",
+    "testedBy": [
+      "Best Consulting Engineers",
+      "AAU College of Technology & Built Environment",
+      "Ethiopian Engineering Corporation",
+      "ARCON Design-Build"
+    ]
+  },
+  "fleet": {
+    "show": true,
+    "eyebrow": "Mixer trucks",
+    "title": "GPS-tracked.",
+    "highlight": "Always on time.",
+    "text": "Modern drum systems keep concrete fresh during delivery, and our tracked fleet ensures timely dispatch across the city.",
+    "image": "assets/img/fleet.jpg"
+  },
+  "testimonials": {
+    "show": true,
+    "eyebrow": "Testimonies",
+    "title": "What our",
+    "highlight": "clients say",
+    "text": "From a 32-floor tower in Kazanchis to a wastewater treatment plant at Koye Feche.",
+    "items": [
+      { "quote": "Their team consistently demonstrated excellent coordination, high-quality standards, and a strong commitment to timely delivery.", "who": "S.Hawi General Contractor", "project": "Kazanchis G+32 tower" },
+      { "quote": "CoBuilt consistently delivered high-quality concrete that met our technical specifications and project requirements.", "who": "CGCOC Group", "project": "Addis Ababa Wastewater Treatment Plant, Koye Feche" },
+      { "quote": "We are highly satisfied with the quality of the concrete and the punctuality of the deliveries.", "who": "SD Steel Industry", "project": "745 m³ delivered · Gelan site" },
+      { "quote": "We are very satisfied with the quality of the concrete and the punctual delivery service provided.", "who": "XIMAR Construction", "project": "Foundation works · Bole Bulbula" }
+    ]
+  },
+  "steps": {
+    "show": true,
+    "eyebrow": "How it works",
+    "title": "Order to pour in",
+    "highlight": "four steps",
+    "items": [
+      { "title": "Request a quote", "text": "Share your grade, volume, date and site location." },
+      { "title": "Mix design & schedule", "text": "Our engineers confirm the mix and book your delivery slot." },
+      { "title": "Batch & deliver", "text": "Batched in our automated plant, dispatched by GPS-tracked trucks." },
+      { "title": "Pour & test", "text": "Cube samples are taken on site and results shared with you." }
+    ]
+  },
+  "contact": {
+    "eyebrow": "Let's talk",
+    "title": "Contact us!",
+    "text": "Send your grade, volume and date. We reply quickly with a price, a mix design recommendation and available delivery slots.",
+    "phones": ["+251 911 246 502", "+251 911 246 820"],
+    "email": "info@cobuiltsolutions.com",
+    "address": "Office: Bole, Woreda 12 · Plant: Goro, Addis Ababa",
+    "whatsapp": "+251 911 246 502",
+    "formGrades": ["C20", "C25", "C30", "C35", "C40", "C50", "Other"]
+  },
+  "footer": {
+    "tagline": "Engineered for strength,",
+    "taglineBold": "built for tomorrow.",
+    "website": "www.CoBuiltSolutions.com",
+    "tin": "TIN 0073223270",
+    "copyright": "© 2026 CoBuilt Solutions. All rights reserved."
+  }
+}
