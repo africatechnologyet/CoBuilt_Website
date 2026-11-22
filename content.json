@@ -28,9 +28,9 @@
       "label": "Plant capacity"
     },
     {
-      "value": 15,
+      "value": 1500,
       "suffix": "+",
-      "label": "Mixer trucks in fleet"
+      "label": "Daily production capacity"
     },
     {
       "value": 102000,
