@@ -18,6 +18,21 @@
   function arr(v) { return Array.isArray(v) ? v : []; }
   function digits(v) { return String(v || '').replace(/[^\d+]/g, ''); }
   function shown(sec) { return sec && sec.show !== false; }
+  /* social media links (each one has its own on/off switch in the admin) */
+  var SOCIAL = [["facebook", "Facebook"], ["instagram", "Instagram"], ["linkedin", "LinkedIn"], ["tiktok", "TikTok"], ["telegram", "Telegram"], ["youtube", "YouTube"], ["x", "X (Twitter)"]];
+  var SOCIAL_ICONS = {"facebook": "M14 8h3V4h-3c-2.8 0-4.5 1.8-4.5 4.6V11H7v4h2.5v9h4v-9h3l.5-4h-3.5V8.8c0-.5.3-.8 1-.8z", "instagram": "M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 4 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-2.3.1-3.3 1.2-3.4 3.4-.1 1.2-.1 1.6-.1 4.6s0 3.4.1 4.6c.1 2.3 1.1 3.3 3.4 3.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c2.3-.1 3.3-1.2 3.4-3.4.1-1.2.1-1.6.1-4.6s0-3.4-.1-4.6c-.1-2.3-1.2-3.3-3.4-3.4-1.2-.1-1.6-.1-4.7-.1zm0 2.9a5.1 5.1 0 1 1 0 10.2 5.1 5.1 0 0 1 0-10.2zm0 1.8a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6zm5.3-3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z", "linkedin": "M4 9h4v12H4zM6 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM10 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.4 2.6 4.4 6V21h-4v-5.4c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9V21h-4z", "tiktok": "M16.5 3c.3 2.2 1.7 3.6 3.9 3.8v3.3c-1.4.1-2.7-.3-3.9-1v6.3c0 3.5-2.6 5.9-5.9 5.9S4.7 18.9 4.7 15.6c0-3.4 2.9-6 6.4-5.6v3.4c-1.5-.4-3.1.6-3.1 2.2 0 1.4 1.1 2.5 2.5 2.5 1.5 0 2.6-1.1 2.6-2.7V3z", "telegram": "M21.4 4.2 2.9 11.4c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.8.7.8.5 0 .7-.2.9-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.3-1.4zM8.7 14.1l9.8-6.2c.5-.3.9-.1.5.2l-8.1 7.3-.3 3.4z", "youtube": "M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15V9l5.8 3z", "x": "M17.8 3h3.3l-7.2 8.2L22.4 21h-6.6l-5.2-6.8L4.7 21H1.4l7.7-8.8L1 3h6.8l4.7 6.2zm-1.2 16h1.8L7.5 4.9H5.6z"};
+  function socialLinks(c) {
+    var so = c.social || {};
+    if (so.show === false) return [];
+    return SOCIAL.filter(function (s) { return so[s[0] + 'On'] === true && /^https?:\/\/\S+$/i.test(String(so[s[0]] || '').trim()); })
+      .map(function (s) { return { key: s[0], name: s[1], href: String(so[s[0]]).trim() }; });
+  }
+  function socialHtml(list, cls) {
+    if (!list.length) return '';
+    return '<div class="social ' + (cls || '') + '">' + list.map(function (s) {
+      return '<a href="' + url(s.href) + '" target="_blank" rel="noopener" aria-label="' + esc(s.name) + '" title="' + esc(s.name) + '"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"' + (s.key === 'instagram' ? ' fill-rule="evenodd"' : '') + '><path d="' + SOCIAL_ICONS[s.key] + '"></path></svg></a>';
+    }).join('') + '</div>';
+  }
   /* map: accepts a place name / address, "9.01, 38.76" coordinates, or a pasted Google Maps link */
   function mapTarget(p) {
     var m = String(p.map || '').trim(), addr = String(p.address || p.name || '').trim(), ll;
@@ -102,6 +117,11 @@
     if (b.background) root.setProperty('--bg-img', 'url("' + abs(b.background) + '")');
     if (b.letterTexture) root.setProperty('--letter-img', 'url("' + abs(b.letterTexture) + '")');
     if (c.meta && c.meta.title) document.title = c.meta.title;
+    var sameAs = socialLinks(c).map(function (x) { return x.href; }), ldTag = document.getElementById('ld-social');
+    if (sameAs.length) {
+      if (!ldTag) { ldTag = document.createElement('script'); ldTag.type = 'application/ld+json'; ldTag.id = 'ld-social'; document.head.appendChild(ldTag); }
+      ldTag.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'CoBuilt Solutions', url: location.origin + '/', sameAs: sameAs });
+    } else if (ldTag) ldTag.remove();
     if (c.meta && c.meta.description) { var md = document.querySelector('meta[name="description"]'); if (md) md.setAttribute('content', c.meta.description); }
     deviceStyles(c);
     var phone1 = arr(ct.phones)[0] || '';
@@ -241,7 +261,7 @@
       '<div class="txt reveal"><span class="eyebrow">' + esc(ct.eyebrow) + '</span><h2 class="h2 big" style="color:var(--accent)">' + esc(ct.title) + '</h2>' +
       (ct.text ? '<p class="sub">' + esc(ct.text) + '</p>' : '') +
       '<div class="phones">' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') + '</div>' +
-      '<div class="cinfo">' + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div>' +
+      '<div class="cinfo">' + (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div>' + socialHtml(socialLinks(c), 'in-contact') + '</div>' +
       '<form class="quote-form reveal" id="qform" novalidate>' +
       '<div class="f2"><label class="f">Full name<input name="name" type="text" autocomplete="name" placeholder="Your name"></label>' +
       '<label class="f">Phone<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+251 …" required></label></div>' +
@@ -270,8 +290,9 @@
     }
 
     /* footer */
+    var soc = socialLinks(c);
     html += '<footer class="foot"><div class="wrap"><div class="fgrid"><div><img src="' + url(b.logo) + '" alt="' + esc(b.name) + ' Solutions" style="width:96px;height:auto">' +
-      '<p class="ftag">' + esc(f.tagline) + ' <b>' + esc(f.taglineBold) + '</b></p></div>' +
+      '<p class="ftag">' + esc(f.tagline) + ' <b>' + esc(f.taglineBold) + '</b></p>' + (soc.length ? '<p class="sfollow">' + esc((c.social || {}).title || 'Follow us') + '</p>' + socialHtml(soc) : '') + '</div>' +
       '<div class="fcols"><div><h4>Company</h4>' + nav.map(function (n) { return '<a href="' + n[0] + '">' + esc(n[1]) + '</a>'; }).join('') + '</div>' +
       '<div><h4>Contact</h4>' + arr(ct.phones).map(function (p) { return '<a href="tel:' + digits(p) + '">' + esc(p) + '</a>'; }).join('') +
       (ct.email ? '<a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a>' : '') + (ct.address ? '<span>' + esc(ct.address) + '</span>' : '') + '</div></div></div>' +

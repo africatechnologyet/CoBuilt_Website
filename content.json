@@ -395,6 +395,23 @@
       }
     ]
   },
+  "social": {
+    "title": "Follow us",
+    "facebook": "",
+    "facebookOn": false,
+    "instagram": "",
+    "instagramOn": false,
+    "linkedin": "",
+    "linkedinOn": false,
+    "tiktok": "",
+    "tiktokOn": false,
+    "telegram": "",
+    "telegramOn": false,
+    "youtube": "",
+    "youtubeOn": false,
+    "x": "",
+    "xOn": false
+  },
   "footer": {
     "tagline": "Engineered for strength,",
     "taglineBold": "built for tomorrow.",

@@ -55,6 +55,15 @@
       { k: 'places', t: 'list', add: 'Add location', title: 'Location', fields: [T('name', 'Name', 'e.g. Batching plant'), T('address', 'Address shown on the site'),
         T('map', 'Map pin', 'Most exact: in Google Maps press and hold on the spot, copy the numbers that appear (e.g. 9.0105, 38.7613) and paste them here. A Google Maps share link or a place name also works.'),
         T('note', 'Extra line (optional)', 'e.g. Open Mon–Sat, 7:00–18:00')] }]) },
+    { key: 'social', label: 'Social media', desc: 'Your social media pages. Turn each one on or off. An icon shows in the footer and the contact area only when it is on and has a link (starting with https://).', fields: [
+      T('title', 'Heading above the icons', 'e.g. Follow us'),
+      { k: 'facebookOn', t: 'bool', l: 'Show Facebook', def: false }, T('facebook', 'Facebook link', 'e.g. https://facebook.com/yourpage'),
+      { k: 'instagramOn', t: 'bool', l: 'Show Instagram', def: false }, T('instagram', 'Instagram link', 'e.g. https://instagram.com/yourname'),
+      { k: 'linkedinOn', t: 'bool', l: 'Show LinkedIn', def: false }, T('linkedin', 'LinkedIn link', 'e.g. https://linkedin.com/company/yourcompany'),
+      { k: 'tiktokOn', t: 'bool', l: 'Show TikTok', def: false }, T('tiktok', 'TikTok link', 'e.g. https://tiktok.com/@yourname'),
+      { k: 'telegramOn', t: 'bool', l: 'Show Telegram', def: false }, T('telegram', 'Telegram link', 'e.g. https://t.me/yourchannel'),
+      { k: 'youtubeOn', t: 'bool', l: 'Show YouTube', def: false }, T('youtube', 'YouTube link', 'e.g. https://youtube.com/@yourchannel'),
+      { k: 'xOn', t: 'bool', l: 'Show X (Twitter)', def: false }, T('x', 'X (Twitter) link', 'e.g. https://x.com/yourname')] },
     { key: 'footer', label: 'Footer', desc: 'Bottom of the page.', fields: [T('tagline', 'Tagline (orange)'), T('taglineBold', 'Tagline (white, bold)'), T('website', 'Website text'), T('tin', 'TIN / registration'), T('copyright', 'Copyright line')] },
     { key: 'brand', label: 'Logo, colour & background', desc: 'Your logos, accent colour and the concrete textures.', fields: [
       T('name', 'Short company name', 'Shown next to the small logo in the header.'), { k: 'accent', t: 'color', l: 'Accent colour' },

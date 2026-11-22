@@ -307,3 +307,10 @@ footer .wrap{position:relative;padding-top:72px;padding-bottom:40px;display:flex
 .lpin{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex:none;color:var(--accent);border:1px solid var(--line);background:rgba(255,255,255,.02)}
 .lbody .btn{align-self:center}
 @media (max-width:640px){.loc .map{height:170px}.lbody{padding:20px}.lbody .btn{width:100%;justify-content:center}}
+
+/* social media */
+.sfollow{margin:26px 0 12px;color:#fff;text-transform:uppercase;letter-spacing:1px;font-size:13px;font-weight:600}
+.social{display:flex;flex-wrap:wrap;gap:10px}
+.social a{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--text);border:1px solid #3A3A42;background:rgba(255,255,255,.03);transition:background .2s,color .2s,border-color .2s,transform .2s}
+.social a:hover,.social a:focus-visible{background:var(--accent);border-color:var(--accent);color:#0D0D0F;transform:translateY(-2px)}
+.social.in-contact{margin-top:20px}
