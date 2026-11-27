@@ -18,6 +18,30 @@
   function arr(v) { return Array.isArray(v) ? v : []; }
   function digits(v) { return String(v || '').replace(/[^\d+]/g, ''); }
   function shown(sec) { return sec && sec.show !== false; }
+  /* visitor statistics (Google Analytics). Loads after the page, never in the admin preview. */
+  function track(name, params) { try { if (window.gtag) window.gtag('event', name, params || {}); } catch (e) {} }
+  function startAnalytics(c) {
+    var id = String(((c.meta || {}).analyticsId) || '').trim();
+    if (!/^G-[A-Z0-9]{4,15}$/i.test(id) || isPreview || window.__gaStarted) return;
+    if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+    window.__gaStarted = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', id);
+    var go = function () { var sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id); document.head.appendChild(sc); };
+    if (document.readyState === 'complete') setTimeout(go, 1500); else window.addEventListener('load', function () { setTimeout(go, 1500); }, { once: true });
+    // count enquiries: phone, WhatsApp and email clicks anywhere on the page
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
+      var h = a.getAttribute('href') || '', where = (a.closest('header,.hero,.mbar,#quote,footer,section') || {}).id || (a.closest('.mbar') ? 'bottom_bar' : (a.closest('header') ? 'header' : 'page'));
+      if (h.indexOf('tel:') === 0) track('call_click', { location: where });
+      else if (h.indexOf('mailto:') === 0) track('email_click', { location: where });
+      else if (/wa\.me|whatsapp/i.test(h)) track('whatsapp_click', { location: where });
+      else if (h === '#quote') track('quote_button_click', { location: where });
+      else if (/google\.com\/maps/.test(h)) track('directions_click', { location: where });
+    }, true);
+  }
   /* social media links (each one has its own on/off switch in the admin) */
   var SOCIAL = [["facebook", "Facebook"], ["instagram", "Instagram"], ["linkedin", "LinkedIn"], ["tiktok", "TikTok"], ["telegram", "Telegram"], ["youtube", "YouTube"], ["x", "X (Twitter)"]];
   var SOCIAL_ICONS = {"facebook": "M14 8h3V4h-3c-2.8 0-4.5 1.8-4.5 4.6V11H7v4h2.5v9h4v-9h3l.5-4h-3.5V8.8c0-.5.3-.8 1-.8z", "instagram": "M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 4 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-2.3.1-3.3 1.2-3.4 3.4-.1 1.2-.1 1.6-.1 4.6s0 3.4.1 4.6c.1 2.3 1.1 3.3 3.4 3.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c2.3-.1 3.3-1.2 3.4-3.4.1-1.2.1-1.6.1-4.6s0-3.4-.1-4.6c-.1-2.3-1.2-3.3-3.4-3.4-1.2-.1-1.6-.1-4.7-.1zm0 2.9a5.1 5.1 0 1 1 0 10.2 5.1 5.1 0 0 1 0-10.2zm0 1.8a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6zm5.3-3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z", "linkedin": "M4 9h4v12H4zM6 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM10 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.4 2.6 4.4 6V21h-4v-5.4c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9V21h-4z", "tiktok": "M16.5 3c.3 2.2 1.7 3.6 3.9 3.8v3.3c-1.4.1-2.7-.3-3.9-1v6.3c0 3.5-2.6 5.9-5.9 5.9S4.7 18.9 4.7 15.6c0-3.4 2.9-6 6.4-5.6v3.4c-1.5-.4-3.1.6-3.1 2.2 0 1.4 1.1 2.5 2.5 2.5 1.5 0 2.6-1.1 2.6-2.7V3z", "telegram": "M21.4 4.2 2.9 11.4c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.8.7.8.5 0 .7-.2.9-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.3-1.4zM8.7 14.1l9.8-6.2c.5-.3.9-.1.5.2l-8.1 7.3-.3 3.4z", "youtube": "M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15V9l5.8 3z", "x": "M17.8 3h3.3l-7.2 8.2L22.4 21h-6.6l-5.2-6.8L4.7 21H1.4l7.7-8.8L1 3h6.8l4.7 6.2zm-1.2 16h1.8L7.5 4.9H5.6z"};
@@ -318,6 +342,7 @@
 
   /* ---------- interactions ---------- */
   function wire(c) {
+    startAnalytics(c);
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // mobile menu
@@ -499,6 +524,7 @@
         var n = String(c.contact.whatsapp || '').replace(/\D/g, '');
         window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(lines), '_blank', 'noopener');
       }
+      track('generate_lead', { method: via === 'mail' ? 'email' : 'whatsapp', grade: grade.trim() });
       toast('Opening ' + (via === 'mail' ? 'your email app' : 'WhatsApp') + '…');
     });
   }

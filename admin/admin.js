@@ -69,7 +69,7 @@
       T('name', 'Short company name', 'Shown next to the small logo in the header.'), { k: 'accent', t: 'color', l: 'Accent colour' },
       IMG('logo', 'Main logo', 'logo', 'Transparent PNG works best.'), IMG('mark', 'Small logo icon (header)', 'logo'),
       IMG('background', 'Concrete background', 'bg', 'A large, dark texture photo.'), IMG('letterTexture', 'Texture inside the big title', 'bg', 'A light grey concrete texture.')] },
-    { key: 'meta', label: 'Google & sharing', desc: 'What Google and WhatsApp/Telegram link previews show.', fields: [T('title', 'Page title'), TA('description', 'Description', 'About 150 characters.')] }
+    { key: 'meta', label: 'Google & sharing', desc: 'What Google and WhatsApp/Telegram link previews show.', fields: [T('title', 'Page title'), TA('description', 'Description', 'About 150 characters.'), T('analyticsId', 'Google Analytics measurement ID', 'Starts with G-. Counts visitors; leave empty to switch visitor counting off.')] }
   ];
 
   /* ================= state ================= */
