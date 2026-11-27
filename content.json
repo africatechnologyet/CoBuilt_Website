@@ -360,6 +360,49 @@
       }
     ]
   },
+  "faq": {
+    "show": true,
+    "eyebrow": "Questions",
+    "title": "Ready mix concrete",
+    "highlight": "FAQ",
+    "text": "Answers to what builders in Addis Ababa ask us most. Still unsure? Call us any time, day or night.",
+    "items": [
+      {
+        "q": "How much does ready mix concrete cost per m³ in Addis Ababa?",
+        "a": "The price per cubic metre depends on the concrete grade, the total volume, the distance to your site and whether you need a concrete pump. Send us your grade, volume, pour date and site location through the quote form, WhatsApp or phone and we reply quickly with a written price."
+      },
+      {
+        "q": "Which concrete grade do I need?",
+        "a": "C05 to C15 is used for blinding and mass fill. C20 suits footpaths and light foundations. C25 is the usual choice for residential slabs, footings and columns. C30 is used for structural frames, beams and suspended slabs. C40 to C50 is for high rise structures, heavy duty floors, columns and shear walls, and C60 to C70+ for special high performance work. Always follow your structural engineer's drawings; our engineers can advise on the mix."
+      },
+      {
+        "q": "How do I calculate how much concrete I need?",
+        "a": "Multiply length × width × thickness in metres. For example, a slab 10 m long, 8 m wide and 15 cm thick needs 10 × 8 × 0.15 = 12 m³. Add about 5% for waste and uneven ground. You can use the volume calculator in the quote form below."
+      },
+      {
+        "q": "Do you supply concrete pumps?",
+        "a": "Yes. We deliver with transit mixer trucks and concrete pumps for high rise and hard to reach pours. Tick \"I also need a concrete pump\" in the quote form, or tell us when you call."
+      },
+      {
+        "q": "Which areas do you deliver to?",
+        "a": "We deliver across Addis Ababa and the surrounding area from our two batching plants in Goro/Balo. For sites farther from the city, call us to confirm delivery."
+      },
+      {
+        "q": "How do you make sure the concrete quality is right?",
+        "a": "Mixes are designed to ES EN 206 / ASTM C94 and produced in fully automated XCMG batching plants. Our in house laboratory tests aggregates, slump and compressive strength, cube samples are taken on site, and results are shared with you. Our concrete has been tested by independent laboratories and consultants."
+      },
+      {
+        "q": "When can you deliver, and are you open on weekends?",
+        "a": "We are open 24 hours a day, 7 days a week. Book your pour as early as possible so we can reserve trucks and a pump for your time slot."
+      },
+      {
+        "q": "How do I place an order?",
+        "a": "Send your grade, volume, pour date and site location. Our engineers confirm the mix and book your delivery slot, the concrete is batched and delivered by GPS tracked trucks, and cube samples are taken on site."
+      }
+    ],
+    "amTitle": "ሬዲ ሚክስ ኮንክሪት በአዲስ አበባ",
+    "amText": "ኮብዩልት ሶሉሽንስ በአዲስ አበባ የሬዲ ሚክስ ኮንክሪት አቅራቢ ነው። በጎሮ/ባሎ በሚገኙ ሁለት ሙሉ በሙሉ አውቶማቲክ የ XCMG ባቺንግ ፕላንቶች ከ C05 እስከ C70 ያሉ የኮንክሪት ደረጃዎችን እናመርታለን። ኮንክሪቱን በጂፒኤስ በሚከታተሉ ሚክሰር መኪኖች እና በኮንክሪት ፓምፕ ወደ ሳይትዎ እናደርሳለን። በቀን 24 ሰዓት፣ በሳምንት 7 ቀን ክፍት ነን። የኮንክሪት ዋጋ ለማወቅ የኮንክሪት ደረጃ (ግሬድ)፣ መጠን (ሜትር ኩብ)፣ የሚሞላበትን ቀን እና የሳይቱን ቦታ ይላኩልን ወይም ይደውሉልን።"
+  },
   "contact": {
     "eyebrow": "Let's talk",
     "title": "Contact us!",

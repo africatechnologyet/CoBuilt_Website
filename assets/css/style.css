@@ -384,3 +384,29 @@ footer .wrap{position:relative;padding-top:72px;padding-bottom:40px;display:flex
 @keyframes heroAway{to{translate:0 -40px}}
 @keyframes statGlow{from{text-shadow:none}to{text-shadow:0 0 28px rgba(240,110,34,.35)}}
 .no-intro .head.reveal .h2,.no-intro .txt.reveal .h2,.no-intro .zoom.reveal,.no-intro .zoom.reveal img,.no-intro .stat,.no-intro .table-box tr.row,.no-intro .head .eyebrow,.no-intro .head .sub,.no-intro .txt.reveal > *{transition:none !important;animation:none !important;clip-path:none !important;opacity:1 !important;transform:none !important}
+
+/* FAQ */
+.faq{display:flex;flex-direction:column;gap:12px;max-width:900px}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:10px;transition:border-color .25s}
+.qa[open]{border-color:#3A3A42}
+.qa summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;min-height:44px}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary h3{margin:0;font-size:17px;font-weight:600;line-height:1.4}
+.qa .qi{flex:none;width:22px;height:22px;position:relative}
+.qa .qi::before,.qa .qi::after{content:"";position:absolute;left:3px;right:3px;top:50%;height:2px;margin-top:-1px;background:var(--accent);border-radius:2px;transition:transform .3s}
+.qa .qi::after{transform:rotate(90deg)}
+.qa[open] .qi::after{transform:rotate(0)}
+.qa .ans{padding:0 24px 22px}
+.qa .ans p{margin:0;color:var(--soft);line-height:1.65;font-size:15.5px}
+.qa summary:hover h3{color:var(--accent-soft)}
+.am{margin-top:28px;max-width:900px;padding:24px;border-left:3px solid var(--accent);background:rgba(255,255,255,.02);border-radius:0 10px 10px 0}
+.am h3{margin:0 0 10px;font-size:20px}
+.am p{margin:0;color:var(--soft);line-height:1.8;font-size:16px}
+@media (max-width:640px){.qa summary{padding:18px}.qa .ans{padding:0 18px 18px}.qa summary h3{font-size:16px}}
+/* volume calculator */
+.calc{border:1px dashed #3A3A42;border-radius:8px;padding:0 16px}
+.calc summary{cursor:pointer;color:var(--accent-soft);font-size:14.5px;font-weight:600;padding:12px 0;min-height:44px;display:flex;align-items:center}
+.calc-in{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-bottom:14px}
+.calc-out{grid-column:1/-1;margin:0;color:var(--soft);font-size:14.5px}
+.calc-out b{color:var(--text)}
+@media (max-width:480px){.calc-in{grid-template-columns:1fr 1fr}}

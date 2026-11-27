@@ -51,6 +51,9 @@
       T('email', 'Email', 'Quote requests can be sent here by email.'), T('address', 'Address'),
       T('whatsapp', 'WhatsApp number for quote requests', 'Include the country code, e.g. +251 911 246 502. Leave empty to hide the WhatsApp button.'),
       { k: 'formGrades', t: 'strings', l: 'Grade buttons in the form', add: 'Add grade button' }] },
+    { key: 'faq', label: 'FAQ (questions & answers)', desc: 'Common customer questions. Google can show these answers directly in search results.', fields: [SHOW].concat(HEAD, [TA('text', 'Text beside the title'),
+      { k: 'items', t: 'list', add: 'Add question', title: 'Question', fields: [T('q', 'Question'), TA('a', 'Answer')] },
+      T('amTitle', 'Amharic heading'), TA('amText', 'Amharic text', 'A short paragraph in Amharic helps people who search Google in Amharic find you.')]) },
     { key: 'location', label: 'Location & map', desc: 'Your plant and office on Google Maps, each with a "Get directions" button.', fields: [SHOW].concat(HEAD, [TA('text', 'Text under the title'),
       { k: 'places', t: 'list', add: 'Add location', title: 'Location', fields: [T('name', 'Name', 'e.g. Batching plant'), T('address', 'Address shown on the site'),
         T('map', 'Map pin', 'Most exact: in Google Maps press and hold on the spot, copy the numbers that appear (e.g. 9.0105, 38.7613) and paste them here. A Google Maps share link or a place name also works.'),
@@ -510,7 +513,7 @@
   var HIDE_OPTS = [
     ['heroLogos', 'Client logos under the top buttons'], ['stats', 'Key figures'], ['clients', 'Scrolling client logos'], ['services', 'Services'], ['video', 'Video section'], ['heroVideo', 'Top background video'],
     ['plant', 'Batching plant'], ['lab', 'Laboratory'], ['grades', 'Mix grades & prices'], ['fleet', 'Truck banner'],
-    ['testimonials', 'Testimonials'], ['steps', 'How it works'], ['location', 'Location & map'], ['backToTop', 'Back-to-top button']
+    ['testimonials', 'Testimonials'], ['steps', 'How it works'], ['faq', 'FAQ'], ['location', 'Location & map'], ['backToTop', 'Back-to-top button']
   ];
   function ensureDevices() {
     var c = S.content;

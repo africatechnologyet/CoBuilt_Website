@@ -112,7 +112,7 @@
   var HIDE = {
     heroLogos: '.hero .tiles', stats: '#stats', clients: '.clients', services: '#services', plant: '#plant-block', lab: '#lab-block',
     video: '#video', heroVideo: '.hero-video',
-    grades: '#grades', fleet: '.fleet', testimonials: '#projects', steps: '#process', callBar: '.mbar', backToTop: '.totop', location: '#location'
+    grades: '#grades', fleet: '.fleet', testimonials: '#projects', steps: '#process', callBar: '.mbar', backToTop: '.totop', location: '#location', faq: '#faq'
   };
   var MEDIA = { phone: '(max-width:640px)', tablet: '(min-width:641px) and (max-width:1024px)', computer: '(min-width:1025px)' };
   function px(v, lo, hi) { v = Number(v); return isFinite(v) && v > 0 ? Math.min(hi, Math.max(lo, v)) + 'px' : ''; }
@@ -155,6 +155,7 @@
     if (shown(c.plant) || shown(c.lab)) nav.push(['#plant', 'Plant & Lab']);
     if (shown(c.grades)) nav.push(['#grades', 'Mix grades']);
     if (shown(c.testimonials)) nav.push(['#projects', 'Projects']);
+    if (shown(c.faq) && arr((c.faq || {}).items).length) nav.push(['#faq', 'FAQ']);
     if (shown(c.location) && arr((c.location || {}).places).length) nav.push(['#location', 'Location']);
 
     var html = '';
@@ -283,6 +284,16 @@
       }).join('') + '</ol></div></section>';
     }
 
+    /* FAQ (also given to Google as FAQ structured data) */
+    var fq = c.faq;
+    if (shown(fq) && arr(fq.items).length) {
+      html += '<section class="sec" id="faq"><div class="wrap">' + head(fq, true) + '<div class="faq">' + arr(fq.items).map(function (it, i) {
+        return '<details class="qa reveal"' + (i === 0 ? ' open' : '') + '><summary><h3>' + esc(it.q) + '</h3><span class="qi" aria-hidden="true"></span></summary><div class="ans"><p>' + esc(it.a) + '</p></div></details>';
+      }).join('') + '</div>' +
+      (fq.amText ? '<div class="am reveal" lang="am"><h3>' + esc(fq.amTitle || '') + '</h3><p>' + esc(fq.amText) + '</p></div>' : '') +
+      '</div></section>';
+    }
+
     /* contact + quote form */
     var grades = arr(ct.formGrades).length ? arr(ct.formGrades) : ['C25', 'C30', 'Other'];
     html += '<section class="sec" id="quote"><div class="wrap contact">' +
@@ -298,6 +309,11 @@
       }).join('') + '</div></fieldset>' +
       '<div class="f2"><label class="f">Volume (m³)<input name="volume" type="number" min="1" inputmode="numeric" placeholder="e.g. 30"></label>' +
       '<label class="f">Pour date<input name="date" type="date"></label></div>' +
+      '<details class="calc"><summary>Not sure of the volume? Calculate it</summary><div class="calc-in">' +
+      '<label class="f">Length (m)<input data-calc="l" type="number" min="0" step="0.1" inputmode="decimal" placeholder="10"></label>' +
+      '<label class="f">Width (m)<input data-calc="w" type="number" min="0" step="0.1" inputmode="decimal" placeholder="8"></label>' +
+      '<label class="f">Thickness (cm)<input data-calc="t" type="number" min="0" step="1" inputmode="numeric" placeholder="15"></label>' +
+      '<p class="calc-out" id="calcOut">Enter the size of the slab, footing or beam.</p></div></details>' +
       '<label class="f">Site location<input name="site" type="text" placeholder="Sub-city, woreda or landmark"></label>' +
       '<label class="check"><input name="pump" type="checkbox"> I also need a concrete pump</label>' +
       '<p class="err" id="qerr" role="alert"></p>' +
@@ -343,6 +359,31 @@
   /* ---------- interactions ---------- */
   function wire(c) {
     startAnalytics(c);
+    // FAQ structured data for Google
+    var fqd = c.faq, fqTag = document.getElementById('ld-faq');
+    if (shown(fqd) && arr(fqd.items).length) {
+      if (!fqTag) { fqTag = document.createElement('script'); fqTag.type = 'application/ld+json'; fqTag.id = 'ld-faq'; document.head.appendChild(fqTag); }
+      fqTag.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: arr(fqd.items).filter(function (x) { return x.q && x.a; }).map(function (x) {
+        return { '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } };
+      }) });
+    } else if (fqTag) fqTag.remove();
+    // concrete volume calculator (fills the quote form's volume box)
+    var calcOut = document.getElementById('calcOut');
+    if (calcOut) {
+      var vol = document.querySelector('#qform [name="volume"]');
+      document.querySelectorAll('[data-calc]').forEach(function (inp) {
+        inp.addEventListener('input', function () {
+          var g = function (k) { return parseFloat((document.querySelector('[data-calc="' + k + '"]') || {}).value) || 0; };
+          var m3 = g('l') * g('w') * g('t') / 100;
+          if (m3 > 0) {
+            var withWaste = Math.ceil(m3 * 1.05 * 2) / 2;
+            calcOut.innerHTML = '<b>' + m3.toFixed(2) + ' m³</b> needed. With 5% for waste, order about <b>' + withWaste + ' m³</b>.';
+            if (vol) vol.value = Math.ceil(withWaste);
+            track('volume_calculated', { m3: withWaste });
+          } else calcOut.textContent = 'Enter the size of the slab, footing or beam.';
+        });
+      });
+    }
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // mobile menu
